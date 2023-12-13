@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Welcome to ICL</title>
+<title>Welcome to ICL System</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
-    <h1>ICL</h1>
-    <h2>NTUIM 112-1 Database Management</h2>
+    <h1>ICL System</h1>
+    <!-- <h2>NTUIM 112-1 Database Management</h2> -->
     <div class="link-container">
         <?php
             session_start();
