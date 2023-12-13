@@ -6,12 +6,10 @@
 ## File Structure
 
 - **`README`**: Provides setup instructions and information about the project.
-- **`index.php`**: The home page of the ICL System that links to the user and admin interfaces. [to modify]
+- **`index.php`**: The home page of the ICL System that links to the user and admin interfaces.
 - **`composer.json`**: Defines the project's PHP dependencies and other metadata.
 - **`composer.lock`**: Lock file to record the exact versions of dependencies installed.
 - **`eloquent.php`**: Sets up the Eloquent ORM configuration and initializes the database connection.
-- **`admin_ORM.php`**: Administrator interface for the ORM-based search. [to modify]
-- **`user_ORM.php`**: User interface for the ORM-based search. [to modify]
 - **`style.css`**: Contains the CSS styles for the project's frontend.
 
 請先參考 index.php，會根據是否登入、登入的身分別，render 不同的畫面，檔案也連結好了
@@ -28,12 +26,13 @@ school: [ ID=七賢國中, PASSWORD=523504 ]
                    $password = $_SESSION['password'];
                    $identity = $_SESSION['identity'];
                    取得相應的變數。
-                   根據 identity 檢查身分別是否 valid。
-- **`logout.php`**: 登出，結束 session
-- **`trips.php`**: 
-- **`publicStatistics.php`**: 
+                   根據 identity 檢查身分別是否 valid
+- **`logout.php`**: 使用者登出，結束 session，回到 `index.php`
+- **`publicStatistics.php`**: ICL 公開的資訊，包含按國籍排序參與者數量、合作的學校、學校參與的學期與 session 資料等。
+                              使用者無論是否登入都能查看本頁
 - **`getSchoolsByCounty`**: 根據 public statistics 中 search a school 的 county 欄位，動態 fetch 位於該 county 的 schools
-- **`adminStatistics.php`**: 
+- **`adminStatistics.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 overall attendance rate、attendance rate 最低的學生、no show rate 最高的 trips 等、課程資訊等。
+- **`adminTrips.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 trips 的資料，包含日期、拜訪的學校、參與的學生等。
 
 [to implement]
 - **`adminStudents.php`**: admin 查詢 students
