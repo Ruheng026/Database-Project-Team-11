@@ -1,0 +1,134 @@
+SELECT 
+    ICL_ID,
+    StuNationality,
+    StuType,
+    StuDegree,
+    StuName,
+    StuSex,
+    StuPhone,
+    StuUniversity,
+    StuEmail
+FROM STUDENT
+WHERE StuName = '許毓庭';
+
+SELECT 
+    ICL_ID,
+    StuNationality,
+    StuType,
+    StuDegree,
+    StuName,
+    StuSex,
+    StuPhone,
+    StuUniversity,
+    StuEmail
+FROM STUDENT
+WHERE StuPhone = '0905950328';
+
+SELECT 
+   ICL_ID,
+    StuNationality,
+    StuType,
+    StuDegree,
+    StuName,
+    StuSex,
+    StuPhone,
+    StuUniversity,
+    StuEmail
+FROM STUDENT
+WHERE StuEmail = 'b10705035@ntu.edu.tw';
+
+SELECT StuName, StuNationality, StuType, StuDegree, StuSex, StuPhone, StuUniversity, StuEmail
+FROM STUDENT
+WHERE ICL_ID = '54';
+
+SELECT DISTINCT Semester
+FROM STUDENT_COURSE
+WHERE ICL_ID = '54';
+
+SELECT 
+    Course.CourseName,
+    Course.CourseSch,
+    Course.Credits
+FROM STUDENT_COURSE
+JOIN Course ON STUDENT_COURSE.Course_ID = Course.Course_ID
+WHERE STUDENT_COURSE.ICL_ID = '54' AND STUDENT_COURSE.Semester = '1112';
+
+SELECT 
+    TRIP.Trip_No,
+    TRIP.StartDate,
+    TRIP.EndDate,
+    SCHOOL.SchCounty AS SchoolCounty,
+    SCHOOL.SchName AS SchoolName, 
+    TRIP_STUDENT.ShowUp
+FROM TRIP
+JOIN TRIP_STUDENT ON TRIP.Semester = TRIP_STUDENT.Semester AND TRIP.Trip_No = TRIP_STUDENT.Trip_No
+JOIN TRIP_SCHOOL ON TRIP.Semester = TRIP_SCHOOL.Semester AND TRIP.Trip_No = TRIP_SCHOOL.Trip_No
+JOIN SCHOOL ON TRIP_SCHOOL.School_ID = SCHOOL.School_ID
+WHERE TRIP_STUDENT.ICL_ID = '54' AND TRIP.Semester = '1112';
+
+SELECT DISTINCT Semester
+FROM STUDENT_COURSE
+WHERE ICL_ID = '54';
+
+SELECT DISTINCT GROUP_.Group_ID, SCHOOL.School_ID, SCHOOL.SchName
+FROM GROUP_
+JOIN SCHOOL ON GROUP_.School_ID = SCHOOL.School_ID
+WHERE (GROUP_.LocICL_ID = '54' OR GROUP_.IntlICL_ID = '53') AND GROUP_.Semester = '1112';
+
+SELECT 
+    CASE 
+        WHEN STUDENT.StuType = 'Local' THEN INTL.StuName
+        WHEN STUDENT.StuType = 'International' THEN LOCAL.StuName
+    END AS PartnerName,
+    CASE 
+        WHEN STUDENT.StuType = 'Local' THEN INTL.StuNationality
+        WHEN STUDENT.StuType = 'International' THEN LOCAL.StuNationality
+    END AS PartnerNationality,
+    CASE 
+        WHEN STUDENT.StuType = 'Local' THEN INTL.StuEmail
+        WHEN STUDENT.StuType = 'International' THEN LOCAL.StuEmail
+    END AS PartnerEmail
+FROM GROUP_
+JOIN STUDENT ON (GROUP_.LocICL_ID = STUDENT.ICL_ID OR GROUP_.IntlICL_ID = STUDENT.ICL_ID)
+LEFT JOIN STUDENT AS LOCAL ON GROUP_.LocICL_ID = LOCAL.ICL_ID
+LEFT JOIN STUDENT AS INTL ON GROUP_.IntlICL_ID = INTL.ICL_ID
+WHERE GROUP_.Group_ID = '00000385' AND (STUDENT.ICL_ID = '54');
+
+SELECT 
+    SCHOOL.SchName AS SchoolName,
+    SCHOOL.SchAddress AS SchoolAddress,
+    SCHOOL.SchCounty AS SchoolCounty,
+    CONTACT.ConName AS ContactName,
+    CONTACT.ConEmail AS ContactEmail,
+    CONTACT.ConPhone AS ContactPhone
+FROM GROUP_
+JOIN SCHOOL ON GROUP_.School_ID = SCHOOL.School_ID
+JOIN SEMESTER_CONTACT ON SCHOOL.School_ID = SEMESTER_CONTACT.School_ID AND GROUP_.Semester = SEMESTER_CONTACT.Semester
+JOIN CONTACT_PERSON AS CONTACT ON SEMESTER_CONTACT.ConName = CONTACT.ConName AND SEMESTER_CONTACT.School_ID = CONTACT.School_ID
+WHERE GROUP_.Group_ID = '00000385';
+
+SELECT 
+    SESSION.Date AS SessionDate,
+    GROUP_.StartTime AS StartTime,
+    GROUP_.EndTime AS EndTime,
+    ATTEND_STATUS.AttendType AS AttendanceType,
+    ATTEND_STATUS.Deduction AS DeductionPoints
+FROM SESSION
+JOIN GROUP_ ON SESSION.Group_ID = GROUP_.Group_ID
+JOIN SESSION_ATTENDANCE ON SESSION.Session_ID = SESSION_ATTENDANCE.Session_ID
+JOIN ATTEND_STATUS ON SESSION_ATTENDANCE.Attend_No = ATTEND_STATUS.Attend_No
+WHERE GROUP_.Group_ID = '00000385' AND SESSION_ATTENDANCE.ICL_ID = '54';
+
+SELECT 
+    SUM(ATTEND_STATUS.Deduction) AS TotalDeductionPoints
+FROM SESSION
+JOIN GROUP_ ON SESSION.Group_ID = GROUP_.Group_ID
+JOIN SESSION_ATTENDANCE ON SESSION.Session_ID = SESSION_ATTENDANCE.Session_ID
+JOIN ATTEND_STATUS ON SESSION_ATTENDANCE.Attend_No = ATTEND_STATUS.Attend_No
+WHERE GROUP_.Group_ID = '00000385' AND SESSION_ATTENDANCE.ICL_ID = '54';
+
+SELECT 
+    (COUNT(CASE WHEN SESSION_ATTENDANCE.Attend_No = 'A' THEN 1 ELSE 0 END) * 100.0 / COUNT(CASE WHEN SESSION_ATTENDANCE.Attend_No = 'J' THEN 0 ELSE 1 END)) AS AttendanceRate
+FROM SESSION
+JOIN SESSION_ATTENDANCE ON SESSION.Session_ID = SESSION_ATTENDANCE.Session_ID
+WHERE SESSION.Group_ID = '00000385' AND SESSION_ATTENDANCE.ICL_ID = '54';

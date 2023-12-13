@@ -1,0 +1,59 @@
+SELECT 
+COUNT(CASE WHEN SA.Attend_No = 'A' THEN 1 ELSE NULL END) * 100.0 /
+        NULLIF(COUNT(CASE WHEN SA.Attend_No != 'J' THEN 1 ELSE NULL END), 0) 
+        AS AttendanceRate
+FROM 
+    SESSION_ATTENDANCE SA
+JOIN 
+    SESSION S ON SA.Session_ID = S.Session_ID
+JOIN 
+    GROUP_ G ON S.Group_ID = G.Group_ID
+WHERE 
+    G.Semester = '1112';
+
+SELECT 
+    ST.ICL_ID, 
+    ST.StuName, 
+    ROUND(
+        (COUNT(CASE WHEN SA.Attend_No = 'A' THEN 1 ELSE NULL END) * 100.0) /
+        NULLIF(COUNT(CASE WHEN SA.Attend_No != 'J' THEN 1 ELSE NULL END), 0),
+        2
+    ) AS AttendanceRate
+FROM 
+    STUDENT ST
+JOIN 
+    SESSION_ATTENDANCE SA ON ST.ICL_ID = SA.ICL_ID
+JOIN 
+    SESSION S ON SA.Session_ID = S.Session_ID
+JOIN 
+    GROUP_ G ON S.Group_ID = G.Group_ID
+WHERE 
+    G.Semester = '1112'
+GROUP BY 
+    ST.ICL_ID, ST.StuName
+ORDER BY 
+    AttendanceRate ASC
+LIMIT 10;
+
+SELECT 
+    TRIP.Trip_No,
+    COUNT(*) AS TotalStudents,
+    SUM(CASE WHEN TRIP_STUDENT.ShowUp = 'F' THEN 1 ELSE 0 END) AS NoShowCount,
+    (SUM(CASE WHEN TRIP_STUDENT.ShowUp = 'F' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) AS NoShowRate
+FROM TRIP
+JOIN TRIP_STUDENT ON TRIP.Semester = TRIP_STUDENT.Semester AND TRIP.Trip_No = TRIP_STUDENT.Trip_No
+WHERE TRIP.Semester = '1112'
+GROUP BY TRIP.Trip_No
+ORDER BY NoShowRate DESC
+LIMIT 10;
+
+SELECT 
+    COURSE.Course_ID,
+    COURSE.CourseName,
+    COURSE.CourseSch,
+    COURSE.Credits,
+    COUNT(*) AS EnrolledStudents
+FROM STUDENT_COURSE
+JOIN COURSE ON STUDENT_COURSE.Course_ID = COURSE.Course_ID
+WHERE STUDENT_COURSE.Semester = '1112'
+GROUP BY COURSE.Course_ID, COURSE.CourseName, COURSE.CourseSch, COURSE.Credits;

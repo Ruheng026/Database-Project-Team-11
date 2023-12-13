@@ -1,0 +1,49 @@
+SELECT COUNT(*) AS TotalStudents
+FROM STUDENT;
+
+SELECT Semester, COUNT(DISTINCT ICL_ID) AS NumberOfStudents
+FROM STUDENT_COURSE
+GROUP BY Semester
+ORDER BY Semester;
+
+SELECT StuNationality, COUNT(*) AS TotalStudentsByNationality
+FROM STUDENT
+GROUP BY StuNationality
+ORDER BY TotalStudentsByNationality DESC, StuNationality;
+
+SELECT COUNT(*) AS TotalSchools
+FROM SCHOOL;
+
+SELECT Semester, COUNT(DISTINCT School_ID) AS SchoolCount
+FROM TRIP_SCHOOL
+GROUP BY Semester
+ORDER BY Semester;
+
+SELECT SchCounty, COUNT(DISTINCT School_ID) AS SchoolCount
+FROM SCHOOL
+GROUP BY SchCounty
+ORDER BY SchoolCount DESC, SchCounty;
+
+SELECT DISTINCT SchCounty
+FROM SCHOOL
+ORDER BY SchCounty;
+
+SELECT SchName AS SchoolName, School_ID
+FROM SCHOOL
+WHERE SchCounty = '花蓮縣'
+ORDER BY SchName;
+
+SELECT 
+    SchName AS SchoolName,
+    SchCounty AS SchoolCounty,
+    SchAddress AS SchoolAddress
+FROM SCHOOL
+WHERE School_ID = '150601';
+
+SELECT 
+    Semester,
+    StartTime,
+    EndTime
+FROM GROUP_
+WHERE School_ID = '150601'
+ORDER BY Semester, StartTime;
