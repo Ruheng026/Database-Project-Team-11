@@ -125,7 +125,7 @@ if ($identity !== 'admin') {
                 ->get();
 
             $index = 1;
-            echo "<h3 style='text-align: center;'>10 Students with the Lowest Attendance Rate</h3>";
+            echo "<h3 style='text-align: center;'>10 Trips with the Highest No-show Rate</h3>";
             echo "<table>";
             echo "<tr><th>Rank</th><th>Trip No</th><th>Total Students</th><th>No-show Count</th><th>No-show Rate</th></tr>";
             foreach ($tripStatistics as $row) {
