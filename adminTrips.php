@@ -34,7 +34,9 @@ if ($identity !== 'admin') {
 <body>
 <div class="container">
     <h1>Admin Trips</h1>
-    <a href="index.php" class="search-link">Home</a>
+    <div class="link-container">
+        <a href="index.php" class="search-link">Home</a>
+    </div>
 </div>
 </body>
 </html>

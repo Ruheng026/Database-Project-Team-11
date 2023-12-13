@@ -18,7 +18,7 @@
                 if ($_SESSION['identity'] == "admin") {
                     echo '<a href="adminStudents.php" class="search-link">Admin Students</a>';
                     echo '<a href="adminSchools.php" class="search-link">Admin Schools</a>';
-                    echo '<a href="trips.php" class="search-link">Admin Trips</a>';
+                    echo '<a href="adminTrips.php" class="search-link">Admin Trips</a>';
                     echo '<a href="publicStatistics.php" class="search-link">Public Statistics</a>';
                     echo '<a href="adminStatistics.php" class="search-link">Admin Statistics</a>';
                 }
