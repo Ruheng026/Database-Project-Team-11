@@ -51,6 +51,14 @@ input[type="submit"] {
 input[type="submit"]:hover {
     background-color: #4d73b1;
 }
+input[type="text"] {
+    width: 10%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 input[type="time"] {
     width: 10%;
     padding: 10px;

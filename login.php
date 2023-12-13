@@ -13,18 +13,30 @@ use Illuminate\Database\Capsule\Manager as DB;
 <body>
 <div class="container">
     <h1>Login</h1>
+    <div class="link-container">
+        <a href="index.php" class="search-link">Home</a>
+    </div>
+    
     <form action="login.php" method="post">
-        <div>
-            <label for="user_id">ID</label>
-            <input type="text" name="user_id" id="user_id">
-        </div>
-        <div>
-            <label for="password">PASSWORD</label>
-            <input type="password" name="password" id="password">
-        </div>
-        <section>
-            <button type="submit">Log in</button>
-        </section>
+    <div style='display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
+        <label for="user_id">ID</label>
+        <input type="text" name="user_id" id="user_id">
+        
+        <label for="password">PASSWORD</label>
+        <input type="text" name="password" id="password">
+        
+        <input type="submit" value="Log In" 
+               style='display: inline-start;
+                      margin: 0 10px;
+                      padding: 10px 20px;
+                      background-color: #555555;
+                      color: white;
+                      text-decoration: none;
+                      border-radius: 4px;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                      transition: background-color 0.3s;'
+               onmouseover="this.style.backgroundColor='#4d73b1';" 
+               onmouseout="this.style.backgroundColor='#555555';">
     </form>
 
     <?php
@@ -34,7 +46,12 @@ use Illuminate\Database\Capsule\Manager as DB;
             // get the posted id and password
             $userID = $_POST['user_id'];
             $password = $_POST['password'];
-            // echo "{$userID} {$password}";
+            
+            if ($userID === '' || $password === '') {
+                $error = "Invalid username or password";
+                echo "{$error}";
+                exit();
+            }
 
             // authentic the user
 
@@ -79,6 +96,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 
             $error = "Invalid username or password";
             echo "{$error}";
+            exit();
         }
     ?>
 </div>

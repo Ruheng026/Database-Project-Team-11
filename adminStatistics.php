@@ -37,6 +37,10 @@ if ($identity !== 'admin') {
     <div class="link-container">
         <a href="index.php" class="search-link">Home</a>
     </div>
+    <div>
+        <?php
+        ?>
+    </div>
 </div>
 </body>
 </html>
