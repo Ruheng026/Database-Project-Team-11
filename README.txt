@@ -21,24 +21,25 @@ admin: [ ID=admin, PASSWORD=123 ]
 student: [ ID=松浦明日香, PASSWORD=53 ]
 school: [ ID=七賢國中, PASSWORD=523504 ]
 
-- **`login.php`**: 登入，記錄使用者名稱（ID）、ID（password）、身分別（admin、student、school）
+- **`login.php`**: 登入，記錄使用者名稱（ID）、ID（password）、身分別（admin / student / school）
                    在其他需要登入才能使用的頁面，先寫 session_start()，並確認使用者是否登入，
                    再透過
                    $userID = $_SESSION['user_id'];
                    $password = $_SESSION['password'];
                    $identity = $_SESSION['identity'];
                    取得相應的變數。
-                   可參考 `adminStatistics.php` 前 20 行
+                   根據 identity 檢查身分別是否 valid。
 - **`logout.php`**: 登出，結束 session
 - **`trips.php`**: 
 - **`publicStatistics.php`**: 
+- **`getSchoolsByCounty`**: 根據 public statistics 中 search a school 的 county 欄位，動態 fetch 位於該 county 的 schools
 - **`adminStatistics.php`**: 
 
-關 or 黃
+[to implement]
 - **`adminStudents.php`**: admin 查詢 students
 - **`student.php`**: student 的 my page
 
-關 or 黃
+[to implement]
 - **`adminSchools.php`**: admin 查詢 schools
 - **`school.php`**: school 的 my page
 
