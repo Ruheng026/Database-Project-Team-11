@@ -49,7 +49,7 @@ use Illuminate\Database\Capsule\Manager as DB;
         $totalStudents = DB::table('student')->count();
 
         $index = 1;
-        echo "<h3 style='text-align: center;'>Participants by Nationality</h3>";
+        echo "<h3 style='text-align: center;'>Top 10 Participants by Nationality</h3>";
         echo "<table>";
         echo "<tr><th>Rank</th><th>Nationality</th><th>Participants Count</th></tr>";
         foreach ($studentsByNationality as $nationality) {
