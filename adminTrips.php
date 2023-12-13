@@ -46,7 +46,7 @@ if ($identity !== 'admin') {
             <?php
                 $tripSemesters = DB::table('trip')->distinct()->orderBy('semester', 'desc')->get(['semester']);
                 foreach ($tripSemesters as $semester) {
-                    $selected = ($_POST['semester'] ?? '') == $semester->semester ? 'selected' : '';
+                    $selected = ($_POST['tripSemester'] ?? '') == $semester->semester ? 'selected' : '';
                     echo "<option value='{$semester->semester}' {$selected}>{$semester->semester}</option>";
                 }
             ?>
@@ -78,9 +78,9 @@ if ($identity !== 'admin') {
             if ($trip_basic_info->isNotEmpty()) {
                 echo "<h3 style='text-align: center;'>Trip Basic Info</h3>";
                 echo "<table>";
-                echo "<tr><th>Trip No</th><th>Start Date</th><th>End Date</th></tr>";
+                echo "<tr><th>Semester</th><th>Trip No</th><th>Start Date</th><th>End Date</th></tr>";
                 foreach ($trip_basic_info as $row) {
-                    echo "<tr><td>{$row->trip_no}</td><td>{$row->startdate}</td><td>{$row->enddate}</td></tr>";
+                    echo "<tr><td>{$selectedSemester}</td><td>{$row->trip_no}</td><td>{$row->startdate}</td><td>{$row->enddate}</td></tr>";
                 }
                 echo "</table>";
             } else {
