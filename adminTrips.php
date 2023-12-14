@@ -63,6 +63,12 @@ if ($identity !== 'admin') {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $selectedSemester = $_POST['tripSemester'];
             $selectedTripNo = $_POST['tripNo'];
+            if ($selectedTripNo === "") {
+                echo "<div style='text-align: center;'>";
+                echo "No trips found.";
+                echo "</div>";
+                exit();
+            }
 
             // 1.1 trip basic info
             $trip_basic_info = DB::table('trip')
