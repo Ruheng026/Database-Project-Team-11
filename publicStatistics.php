@@ -91,7 +91,10 @@ use Illuminate\Database\Capsule\Manager as DB;
         
         echo "<h3 style='text-align: center;'>Partner Schools List</h3>";
         
+        // Split the schools into 4 groups
         $schoolsChunks = array_chunk($schools, ceil(count($schools) / 4));
+
+        echo "<div style='text-align: center; width: 100%; margin: 0 auto;'>";
         
         for ($tableIndex = 0; $tableIndex < 4; $tableIndex++) {
             echo "<div style='display: inline-block; margin-left: 10px; margin-right: 10px; vertical-align: top; width: calc(25% - 20px);'>";
@@ -105,6 +108,8 @@ use Illuminate\Database\Capsule\Manager as DB;
             echo "</table>";
             echo "</div>";
         }
+
+        echo "</div>";
         
         echo "<div style='clear: both;'></div>";
         
