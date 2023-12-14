@@ -82,14 +82,45 @@ use Illuminate\Database\Capsule\Manager as DB;
             ->select('schname', 'schcounty')
             ->orderBy('schcounty')
             ->get();
+
+            $schools = DB::table('school')
+            ->select('schname', 'schcounty')
+            ->orderBy('schcounty')
+            ->get()
+            ->toArray();
         
         echo "<h3 style='text-align: center;'>Partner Schools List</h3>";
-        echo "<table>";
-        echo "<tr><th>County</th><th>Name</th></tr>";
-        foreach ($schools as $school) {
-            echo "<tr><td>{$school->schcounty}</td><td>{$school->schname}</td></tr>";
+        
+        // Split the schools into three groups
+        $schoolsChunks = array_chunk($schools, ceil(count($schools) / 4));
+
+        echo "<div style='text-align: center;'>";
+        
+        for ($tableIndex = 0; $tableIndex < 4; $tableIndex++) {
+            // echo "<div style='float: left; margin-right: 20px;'>";
+            echo "<div style='display: inline-block; margin-right: 20px; vertical-align: top;'>";
+            echo "<table>";
+            echo "<tr><th>County</th><th>Name</th></tr>";
+        
+            foreach ($schoolsChunks[$tableIndex] as $school) {
+                echo "<tr><td>{$school->schcounty}</td><td>{$school->schname}</td></tr>";
+            }
+        
+            echo "</table>";
+            echo "</div>";
         }
-        echo "</table>";
+
+        echo "</div>";
+        
+        echo "<div style='clear: both;'></div>";
+        
+        // echo "<h3 style='text-align: center;'>Partner Schools List</h3>";
+        // echo "<table>";
+        // echo "<tr><th>County</th><th>Name</th></tr>";
+        // foreach ($schools as $school) {
+        //     echo "<tr><td>{$school->schcounty}</td><td>{$school->schname}</td></tr>";
+        // }
+        // echo "</table>";
     ?>
     <!-- 5. search a school -->
     <h3 style='text-align: center;'>Search a School</h3>
