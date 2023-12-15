@@ -1,6 +1,8 @@
 {
     "require": {
         "illuminate/database": "^10.31",
-        "illuminate/events": "^10.31"
+        "illuminate/events": "^10.31",
+        "symfony/polyfill-mbstring": "*",
+        "symfony/polyfill-php80": "^1.28"
     }
 }

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b
+class ComposerStaticInit4c5c1b1efc2195de8bd88a6f8eeeb80f
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -50,6 +50,7 @@ class ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b
         ),
         'C' => 
         array (
+            'Carbon\\Doctrine\\' => 16,
             'Carbon\\' => 7,
         ),
         'B' => 
@@ -126,6 +127,10 @@ class ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b
         array (
             0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Inflector',
         ),
+        'Carbon\\Doctrine\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/carbonphp/carbon-doctrine-types/src/Carbon/Doctrine',
+        ),
         'Carbon\\' => 
         array (
             0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
@@ -148,9 +153,9 @@ class ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit711ba3aa14c61df8cbde821e2d4e129b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4c5c1b1efc2195de8bd88a6f8eeeb80f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4c5c1b1efc2195de8bd88a6f8eeeb80f::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit4c5c1b1efc2195de8bd88a6f8eeeb80f::$classMap;
 
         }, null, ClassLoader::class);
     }

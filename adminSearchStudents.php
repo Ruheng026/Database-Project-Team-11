@@ -18,8 +18,8 @@ $userID = $_SESSION['user_id'];
 $password = $_SESSION['password'];
 $identity = $_SESSION['identity'];
 
-// user is not student, redirect to index.php
-if ($identity !== 'student') {
+// user is not admin, redirect to index.php
+if ($identity !== 'admin') {
     header("Location: index.php");
     exit();
 }
@@ -28,18 +28,28 @@ if ($identity !== 'student') {
 <!DOCTYPE html>
 <html>
 <head>
-<title>My Page</title>
+<title>Admin Search Students</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
-    <h1>My Page</h1> 
+    <?php
+    echo "<h1>Students Information</h1>";
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $selectedIclID = $_POST['icl_id'];
+        if ($selectedIclID === "") {
+            echo "<div style='text-align: center;'>";
+            echo "No student name found.";
+            echo "</div>";
+            exit();
+        }
+    ?>
     <div class="link-container">
         <a href="index.php" class="search-link">Home</a>
+        <a href="adminStudents.php" class="search-link">Back to Search</a>
     </div>
-    <form action="student.php" method="post">
+    <form action="adminSearchStudents.php" method="post">
     <?php
-        $selectedIclID = $password;
         // 1.1 student basic info
         $student_basic_info = DB::table('student')
             ->where('icl_id', $selectedIclID)
@@ -72,9 +82,10 @@ if ($identity !== 'student') {
             exit();
         }
         
+    }
     ?>
     <!-- 2. search course and trip -->
-    <form action="student.php" method="post">
+    <form action="adminSearchStudents.php" method="post">
     <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
         <?php
         $semesters = DB::table('student_course')
@@ -102,10 +113,10 @@ if ($identity !== 'student') {
     </form>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $selectedSemester = $_POST['studentSemester'] ?? "1111";
+            $selectedSemester = $_POST['studentSemester']??"";
             if ($selectedSemester === "") {
                 echo "<div style='text-align: center;'>";
-                echo "No semester found.";
+                echo "No semester selected.";
                 echo "</div>";
                 exit();
             }
@@ -137,6 +148,7 @@ if ($identity !== 'student') {
                 'course.course_id',
             )
             ->first();
+
             
             if ($semesterCourse) {
                 $semesterCourseName = $semesterCourse->coursename;
@@ -164,27 +176,27 @@ if ($identity !== 'student') {
             ->select('trip.trip_no as trip_no', 'trip.startdate', 'trip.enddate', 'school.schcounty as schoolcounty', 'school.schname as schoolname', 'trip_student.showup')
             ->get();
             echo "<h3 style='text-align: left;'>Your Trip Information </h3>";
-        if ($semester_trip_info->isNotEmpty()) {
-            echo "<table>";
-            echo "<tr><th>Trip No</th><th>Date</th><th>County</th><th>Schools to be visited</th><th>Show Up</th></tr>";
-            foreach ($semester_trip_info as $row) {
-                $date = ($row->startdate == $row->enddate) ? $row->startdate : "{$row->startdate} ~ {$row->enddate}";
-                echo "<tr><td>{$row->trip_no}</td><td>{$date}</td><td>{$row->schoolcounty}</td><td>{$row->schoolname}</td><td>{$row->showup}</td></tr>";
+
+            if ($semester_trip_info->isNotEmpty()) {
+                echo "<table>";
+                echo "<tr><th>Trip No</th><th>Date</th><th>County</th><th>Schools to be visited</th><th>Show Up</th></tr>";
+                foreach ($semester_trip_info as $row) {
+                    $date = ($row->startdate == $row->enddate) ? $row->startdate : "{$row->startdate} ~ {$row->enddate}";
+                    echo "<tr><td>{$row->trip_no}</td><td>{$date}</td><td>{$row->schoolcounty}</td><td>{$row->schoolname}</td><td>{$row->showup}</td></tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<div style='text-align: center;'>";
+                echo "No trip found.";
+                echo "</div>";
             }
-            echo "</table>";
-        } else {
-            echo "<div style='text-align: center;'>";
-            echo "No trip found.";
-            echo "</div>";
-        }
-            
         }
         else{
             echo "<h4 style='text-align: center;'> select a semester</h4>";
         }
     ?>
     <!-- 3. semester, school -->
-    <form action="student.php" method="post">
+    <form action="adminSearchStudents.php" method="post">
     <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
         <label for="studentSemester">Semester:</label>
         <select name="studentSemester" id="studentSemester">
@@ -301,73 +313,93 @@ if ($identity !== 'student') {
             )
             ->first();
 
-            if ($school_basic_info) {
-                $semesterSchoolCounty = $school_basic_info->schoolcounty;
-                $semesterSchoolName = $school_basic_info->schoolname;
-                $semesterSchoolAddress = $school_basic_info->schooladdress;
-                $semesterSchoolContactName = $school_basic_info->contactname;
-                $semesterSchoolContactEmail = $school_basic_info->contactemail;
-                $semesterSchoolContactPhone = $school_basic_info->contactphone;
-                echo "<h3 style='text-align: left;'>School's Information </h3>";
-                echo "<h3 style='text-align: center;'>$semesterSchoolCounty $semesterSchoolName</h3>";
+        if ($school_basic_info) {
+            $semesterSchoolCounty = $school_basic_info->schoolcounty;
+            $semesterSchoolName = $school_basic_info->schoolname;
+            $semesterSchoolAddress = $school_basic_info->schooladdress;
+            $semesterSchoolContactName = $school_basic_info->contactname;
+            $semesterSchoolContactEmail = $school_basic_info->contactemail;
+            $semesterSchoolContactPhone = $school_basic_info->contactphone;
+            echo "<h3 style='text-align: left;'>School's Information </h3>";
+            echo "<h3 style='text-align: center;'>$semesterSchoolCounty $semesterSchoolName</h3>";
 
-                echo "<h4 style='text-align: center;'>   $semesterSchoolAddress</h4>";
-                echo "<h4 style='text-align: center;'>   $semesterSchoolContactName $semesterSchoolContactPhone $semesterSchoolContactEmail</h4>";
+            echo "<h4 style='text-align: center;'>   $semesterSchoolAddress</h4>";
+            echo "<h4 style='text-align: center;'>   $semesterSchoolContactName $semesterSchoolContactPhone $semesterSchoolContactEmail</h4>";
 
-            } else {
-                echo "<div style='text-align: center;'>";
-                echo "No school found.";
-                echo "</div>";
-                exit();
-            }
-            //3.3 session
-            $session_info = DB::table('group_')
-                ->where('group_.group_id', $selectedGroupId)
-                ->join('session', 'group_.group_id', '=', 'session.group_id')
-                ->join('session_attendance', 'session.session_id', '=', 'session_attendance.session_id')
-                ->join('attend_status', 'session_attendance.attend_no', '=', 'attend_status.attend_no')
-                ->where('session_attendance.icl_id', $selectedIclID)
-                ->select(
-                    'session.date as sessiondate',
-                    'group_.starttime as starttime',
-                    'group_.endtime as endtime',
-                    'attend_status.attendtype as attendancetype',
-                    'attend_status.deduction as deductionpoints'
-                )
-                ->get();
-
-            if ($session_info) {
-                echo "<h3 style='text-align: left;'>Sessoion's Information </h3>";
-                echo "<table>";
-                echo "<tr><th>Date</th><th>Time</th><th>Attendance</th><th>Deduction</th></tr>";
-                foreach ($session_info as $row) {
-                    $time = ($row->starttime == $row->endtime) ? $row->starttime : "{$row->starttime} ~ {$row->endtime}";
-                    echo "<tr><td>{$row->sessiondate}</td><td>{$time}</td><td>{$row->attendancetype}</td><td>{$row->deductionpoints}</td></tr>";
-                }
-                echo "</table>";
-            } else {
-                echo "<div style='text-align: center;'>";
-                echo "No session found.";
-                echo "</div>";
-                exit();
-            }
-            //3.4 total deduction
-            $deduction = DB::table('session')
+        } else {
+            echo "<div style='text-align: center;'>";
+            echo "No school found.";
+            echo "</div>";
+            exit();
+        }
+        //3.3 session
+        $session_info = DB::table('group_')
             ->where('group_.group_id', $selectedGroupId)
-            ->join('group_', 'session.group_id', '=', 'group_.group_id')
+            ->join('session', 'group_.group_id', '=', 'session.group_id')
             ->join('session_attendance', 'session.session_id', '=', 'session_attendance.session_id')
             ->join('attend_status', 'session_attendance.attend_no', '=', 'attend_status.attend_no')
             ->where('session_attendance.icl_id', $selectedIclID)
-            ->sum('attend_status.deduction');
-            echo "<h3 style='text-align: left;'>Total Deduction Point</h3>";
-            echo "<h3 style='text-align: center;'>$deduction </h3>";
+            ->select(
+                'session.date as sessiondate',
+                'group_.starttime as starttime',
+                'group_.endtime as endtime',
+                'attend_status.attendtype as attendancetype',
+                'attend_status.deduction as deductionpoints'
+            )
+            ->get();
 
+        if ($session_info) {
+            echo "<h3 style='text-align: left;'>Sessoion's Information </h3>";
+            echo "<table>";
+            echo "<tr><th>Date</th><th>Time</th><th>Attendance</th><th>Deduction</th></tr>";
+            foreach ($session_info as $row) {
+                $time = ($row->starttime == $row->endtime) ? $row->starttime : "{$row->starttime} ~ {$row->endtime}";
+                echo "<tr><td>{$row->sessiondate}</td><td>{$time}</td><td>{$row->attendancetype}</td><td>{$row->deductionpoints}</td></tr>";
+            }
+            echo "</table>";
+        } else {
+            echo "<div style='text-align: center;'>";
+            echo "No session found.";
+            echo "</div>";
+            exit();
+        }
+        //3.4 total deduction
+        $deduction = DB::table('session')
+        ->where('group_.group_id', $selectedGroupId)
+        ->join('group_', 'session.group_id', '=', 'group_.group_id')
+        ->join('session_attendance', 'session.session_id', '=', 'session_attendance.session_id')
+        ->join('attend_status', 'session_attendance.attend_no', '=', 'attend_status.attend_no')
+        ->where('session_attendance.icl_id', $selectedIclID)
+        ->sum('attend_status.deduction');
+        echo "<h3 style='text-align: left;'>Total Deduction Point:</h3>";
+        echo "<h3 style='text-align: center;'>$deduction </h3>";
+
+        //3.5 attendance
+        $attendanceRate = DB::table('session')
+            ->where('session.group_id', $selectedGroupId)
+            ->join('session_attendance', 'session.session_id', '=', 'session_attendance.session_id')
+            ->where('session_attendance.icl_id', $selectedIclID)
+            ->selectRaw('
+                ROUND(
+                    CASE
+                        WHEN COUNT(CASE WHEN session_attendance.attend_no = ? THEN 1 ELSE 0 END) = 0 THEN 0
+                        ELSE (COUNT(CASE WHEN session_attendance.attend_no = ? THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(CASE WHEN session_attendance.attend_no != ? THEN 1 END), 0))
+                    END,
+                    2
+                ) AS attendance_rate', ['A', 'A', 'J'])
+            ->value('attendance_rate');
+
+
+
+        echo "<h3 style='text-align: left;'>Session Attendance Rate:</h3>";
+        echo "<h3 style='text-align: center;'>$attendanceRate %</h3>";
         }
         else{
-            echo "<h4 style='text-align: center;'> select a school</h4>";
+            echo "<h4 style='text-align: center;'> select a semester</h4>";
         }
         
     ?>  
+
 </div>
 </body>
 </html>
