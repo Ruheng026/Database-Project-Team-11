@@ -48,6 +48,16 @@ if ($identity !== 'admin') {
         <a href="index.php" class="search-link">Home</a>
         <a href="adminStudents.php" class="search-link">Back to Search</a>
     </div>
+    <script>
+    function toggleEditArea() {
+        var editArea = document.getElementById('edit_area');
+        if (editArea.style.display === 'none' || editArea.style.display === '') {
+            editArea.style.display = 'block';
+        } else {
+            editArea.style.display = 'none';
+        }
+    }
+    </script>
     <form action="adminSearchStudents.php" method="post">
     <?php
         // 1.1 student basic info
@@ -67,23 +77,52 @@ if ($identity !== 'admin') {
             ->get();
 
         if ($student_basic_info->isNotEmpty()) {
-            echo "<h3 style='text-align: center;'>Student Basic Information</h3>";
+            
+            echo "<div style='text-align: right;'>
+                <h3 style='text-align: center;'>Student Basic Information</h3>
+                </div>";
+            
             echo "<table>";
+            
             echo "<tr><th>Name</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
             foreach ($student_basic_info as $row) {
-                $selectedName = $row->stuname;
-                echo "<tr><td>{$row->stuname}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
-            }
+    $selectedName = $row->stuname;
+
+        echo "<tr>
+            <td>{$row->stuname}</td>
+            <td>{$row->icl_id}</td>
+            <td>{$row->stunationality}</td>
+            <td>{$row->stuuniversity}</td>
+            <td>{$row->stuphone}</td>
+            <td>{$row->stuemail}</td>
+           
+                <form action=\"editStudent.php\" method=\"post\">
+                    <input type=\"hidden\" name=\"icl_id\" value=\"$selectedIclID\">
+                </form>
+         
+        </tr>";
+}
+            echo "<input type=\"hidden\" name=\"icl_id\" value= \"$row->icl_id\">";
+            echo "<input type=\"hidden\" name=\"display\" value= \"editArea.style.display\">";
+            echo "<form action=\"editStudent.php\" method=\"post\">";
+            echo "<input type=\"hidden\" name=\"icl_id\" value=\"$selectedIclID\">";
+            echo "<div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>";
+            echo "<input type=\"submit\" value=\"Edit\">";
+            echo "</div>";
+            echo "</form>";
             echo "</table>";
+            
+            
         } else {
             echo "<div style='text-align: center;'>";
             echo "No student found.";
             echo "</div>";
             exit();
-        }
+        }    
         
     }
     ?>
+    
     <!-- 2. search course and trip -->
     <form action="adminSearchStudents.php" method="post">
     <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
@@ -109,7 +148,7 @@ if ($identity !== 'admin') {
         ?>
         </select>
         <input type="submit" value="Search">
-        </div>
+    </div>
     </form>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST") {

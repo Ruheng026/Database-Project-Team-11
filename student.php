@@ -71,8 +71,22 @@ if ($identity !== 'student') {
             echo "</div>";
             exit();
         }
-        
-    ?>
+        echo "<input type=\"hidden\" name=\"icl_id\" value= \"$row->icl_id\">";
+        echo "<input type=\"hidden\" name=\"display\" value= \"editArea.style.display\">";
+        echo "<div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>";
+        echo "<input type=\"submit\" value=\"Edit\">";
+        echo "</div>";
+        echo "</form>";
+
+?>
+
+    <form action="editStudent.php" method="post">
+        <input type="hidden" name="icl_id" value="<?= $selectedIclID ?>">
+        <div style="display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;">
+            <input type="submit" value="Edit">
+        </div>
+    </form>
+
     <!-- 2. search course and trip -->
     <form action="student.php" method="post">
     <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
