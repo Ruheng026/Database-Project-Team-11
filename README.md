@@ -47,7 +47,7 @@
 
 
 
-## **Installation and Setup**
+## **Installation and Setup (和上課範例相同)**
 
 ### **Step 1: System Requirements** 
 
@@ -94,7 +94,7 @@ Go to your PHP directory (e.g., at **`C:\xampp\php`**) to edit php.ini using any
 
 
 
-## **Running the Application**
+## **Running the Application (和上課範例相同)**
 
 ### **Starting Apache**
 
