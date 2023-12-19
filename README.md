@@ -107,7 +107,7 @@ Access the system via **`http://localhost/your-project-folder/`** in your web br
 ### **測試帳號與密碼**
 - **admin**: [ ID=admin, PASSWORD=123 ]
 - **student**: [ ID=松浦明日香, PASSWORD=53 ]
-- **school**: [ ID=七賢國中, PASSWORD=523504 ]
+- **school**: [ ID=湖埔國小, PASSWORD=714618 ]
 
 ### **Before Log In**
 
