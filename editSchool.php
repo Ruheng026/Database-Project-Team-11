@@ -23,6 +23,10 @@ if ($identity !== 'admin') {
     header("Location: index.php");
     exit();
 }
+
+DB::beginTransaction();
+DB::table('session_attendance')->lockForUpdate()->get();
+
 ?>
 <meta charset="UTF-8">
 <!DOCTYPE html>
@@ -44,6 +48,7 @@ if ($identity !== 'admin') {
             echo "<div style='text-align: center;'>";
             echo "No group found.";
             echo "</div>";
+            DB::rollBack();
             exit();
         }
 
@@ -55,7 +60,22 @@ if ($identity !== 'admin') {
     
     <form action="editSchool.php" method="post">
         <?php
-            
+            $the_session= DB::table('session')
+            ->join('group_',function($join){
+                $join->on('session.group_id','=','group_.group_id');
+            })
+            ->join('session_attendance',function($join){
+                $join->on('session.session_id','=','session_attendance.session_id');
+            })
+            ->join('attend_status',function($join){
+                $join->on('session_attendance.attend_no','attend_status.attend_no');
+            })
+            ->where('group_.group_id',$selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
+            ->select('session.date','group_.starttime','group_.endtime','group_.locicl_id','group_.intlicl_id','attend_status.attendtype as local')
+            ->distinct()
+            ->get();
+
             $local_session = DB::table('session')
                 ->join('group_',function($join){
                     $join->on('session.group_id','=','group_.group_id');
@@ -112,52 +132,38 @@ if ($identity !== 'admin') {
 
             if ($local_session->isNotEmpty() || $intl_session->isNotEmpty()) {
                 echo "<h3 style='text-align: left;'>Session Info </h3>";
-
                 echo"<table>";
-                
                 echo "<tr><th>Date</th><th>Time</th><th>Attendance of {$selectedIntlName}(International Student)</th><th>Attendance of {$selectedLocName} (Local Student)</th></tr>";
-                // Iterate over the international sessions
-                foreach ($intl_session as $intl_row) {
-                    $local_row = $local_session->firstWhere('date', $intl_row->date);
-                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th>
+                foreach ($the_session as $srow) {
+                    echo "<tr><th>{$srow->date}</th><th>{$srow->starttime}~{$srow->endtime}</th>
+                    <th>
+                    <select name=\"selectedIntlStatus\" id=\"selectedIntlStatus\" style=\"width:260px\" >";
+                    foreach($attend_status as $row){
+                        $selected =($_POST['selectedIntlStatus']??'')==$row->attendtype?'attendtype':'';
+                        echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
+                    }
+                    echo"
+                    </select>
+                    </th>
+
                     <th>
                     <select name=\"selectedLocStatus\" id=\"selectedLocStatus\" style=\"width:260px\" >";
                     foreach($attend_status as $row){
                         $selected =($_POST['selectedLocStatus']??'')==$row->attendtype?'attendtype':'';
                         echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
                     }
+                    $_POST['selectedSessionId'] = $srow->session_id;
+                        $_POST['local_id'] = $srow->locicl_id;
+                        $_POST['intl_id'] = $srow->intlicl_id;
+                        $_POST['selectedLocDate'] = $srow->date;
+                        $_POST['selectedLocStartTime'] = $srow->starttime;
                     echo"
                     </select>
-                        
                     </th>";
-                    
-                    // Check if corresponding international session exists
-                    if ($intl_row) {
-                        echo "<th>
-                        <select name=\"selectedIntlStatus\" id=\"selectedIntlStatus\" style=\"width:260px\">";
-                        foreach($attend_status as $row){
-                            $_POST['selectedDate'] = $intl_row->date;
-                            $_POST['selectedStartTime'] = $intl_row->starttime;
-                            $selected =($_POST['selectedIntlStatus']??'')==$row->attendtype?'attendtype':'';
-                            echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
-                        }
-                        echo"
-                        </select>
-            
-                        </th></tr>";
-                    } else {
-                        echo "<th>N/A</th></tr>";
-                    }
                 }
-                // If there are local sessions without corresponding international sessions
-                foreach ($local_session as $local_row) {
-                    $intl_row = $intl_session->firstWhere('date', $local_row->date);
-            
-                    // Check if corresponding local session already printed
-                    if (!$intl_row) {
-                        echo "<tr><th>{$local_row->date}</th><th>N/A</th><th>N/A</th><th>{$local_row->local}</th></tr>";
-                    }
-                }
+                echo"</table>";
+                
+                echo"<table>";
                 
                 echo "</table>
                 <input type=\"hidden\" name=\"group_id\" value=\"$selectedGroupID\">
@@ -172,8 +178,62 @@ if ($identity !== 'admin') {
         }
         
         ?>
-
     </form>
+    <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveChanges'])) {
+            // Handle form submission
+            $selectedLocSessionId = isset($_POST['selectedSessionId']) ? $_POST["selectedSessionId"] : null;
+            $selectedIntlSessionId = isset($_POST['selectedSessionId']) ? $_POST["selectedSessionId"] : null;
+            $selectedLocID = isset($_POST["local_id"])? $_POST["local_id"] : null;
+            $selectedIntlID = isset($_POST["intl_id"])?$_POST["intl_id"] : null;
+            $selectedLocStatus = isset($_POST["selectedLocStatus"])? $_POST["selectedLocStatus"] : null;
+            $selectedIntlStatus = isset($_POST["selectedIntlStatus"])? $_POST["selectedIntlStatus"] : null;
+            echo "<h3 style='text-align: left;'>Session Info $selectedLocSessionId $selectedIntlSessionId</h3>";
+            
+            try {
+                $selectedLocStatusNo = DB::table('attend_status')
+                ->where('attendtype', $selectedLocStatus)
+                ->select('attend_no')
+                ->first();
+                $selectedLocStatusNo = $selectedLocStatusNo->attend_no;
+                $selectedIntlStatusNo = DB::table('attend_status')
+                ->where('attendtype', $selectedIntlStatus)
+                ->select('attend_no')
+                ->first();
+                $selectedIntlStatusNo = $selectedIntlStatusNo->attend_no; 
+            
+                // Update the record
+                $result1 = DB::table('session_attendance')
+                ->where('session_id', $selectedLocSessionId)
+                ->where('icl_id', $selectedLocID)
+                ->update(['attend_no' => $selectedLocStatusNo]);
+        
+                $result2 = DB::table('session_attendance')
+                ->where('session_id', $selectedIntlSessionId)
+                ->where('icl_id', $selectedIntlID)
+                ->update(['attend_no' => $selectedIntlStatusNo]);
+                
+                if ($result1 || $result2) {
+                    DB::commit();
+                    echo "Update successful!";
+                    if ($identity === 'school')
+                        header("Location: school.php");
+                    if ($identity === 'admin')
+                        header("Location: adminSchool.php");
+                    exit();
+    
+                } else {
+                    throw new \Exception("Error updating record.");
+                    DB::rollBack();
+                }
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+                DB::rollBack();
+            }
+        
+    
+        }
+    ?>
     
 
 </div>

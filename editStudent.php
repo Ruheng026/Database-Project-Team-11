@@ -55,7 +55,7 @@ DB::table('student')->lockForUpdate()->get();
     
     <form action="editStudent.php" method="post">
     <?php
-        $refresh = 0;
+
         // 1.1 student basic info
         $student_basic_info = DB::table('student')
             ->where('icl_id', $selectedIclID)
