@@ -272,7 +272,6 @@ if ($identity !== 'admin') {
         <label for="studentGroupSchool">School:</label>
         <select name="studentGroupSchool" id="studentGroupSchool">
         <?php
-
             foreach ($groups as $row) {
                 $selected = (($_POST['studentGroupSchool'] ?? '') == $row->schname) ? 'selected' : '';
                 $selectedGroupId = $row->group_id;
@@ -415,18 +414,18 @@ if ($identity !== 'admin') {
 
         //3.5 attendance
         $attendanceRate = DB::table('session')
-            ->where('session.group_id', $selectedGroupId)
-            ->join('session_attendance', 'session.session_id', '=', 'session_attendance.session_id')
-            ->where('session_attendance.icl_id', $selectedIclID)
-            ->selectRaw('
-                ROUND(
-                    CASE
-                        WHEN COUNT(CASE WHEN session_attendance.attend_no = ? THEN 1 ELSE 0 END) = 0 THEN 0
-                        ELSE (COUNT(CASE WHEN session_attendance.attend_no = ? THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(CASE WHEN session_attendance.attend_no != ? THEN 1 END), 0))
-                    END,
-                    2
-                ) AS attendance_rate', ['A', 'A', 'J'])
-            ->value('attendance_rate');
+        ->where('session.group_id', $selectedGroupId)
+        ->join('session_attendance', 'session.session_id', '=', 'session_attendance.session_id')
+        ->where('session_attendance.icl_id', $selectedIclID)
+        ->selectRaw('
+            ROUND(
+                CASE
+                    WHEN COUNT(CASE WHEN session_attendance.attend_no = ? THEN 1 ELSE 0 END) = 0 THEN 0
+                    ELSE (COUNT(CASE WHEN session_attendance.attend_no = ? THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(CASE WHEN session_attendance.attend_no = ? THEN 0 ELSE 1 END), 0))
+                END,
+                2
+            ) AS attendance_rate', ['A', 'A', 'J'])
+        ->value('attendance_rate');
 
 
 
@@ -434,7 +433,7 @@ if ($identity !== 'admin') {
         echo "<h3 style='text-align: center;'>$attendanceRate %</h3>";
         }
         else{
-            echo "<h4 style='text-align: center;'> select a semester</h4>";
+            echo "<h4 style='text-align: center;'>Select a semester</h4>";
         }
         
     ?>  
