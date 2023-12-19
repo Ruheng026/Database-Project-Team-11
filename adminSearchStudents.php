@@ -86,19 +86,19 @@ if ($identity !== 'admin') {
             
             echo "<tr><th>Name</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
             foreach ($student_basic_info as $row) {
-    $selectedName = $row->stuname;
+                $selectedName = $row->stuname;
 
-        echo "<tr>
-            <td>{$row->stuname}</td>
-            <td>{$row->icl_id}</td>
-            <td>{$row->stunationality}</td>
-            <td>{$row->stuuniversity}</td>
-            <td>{$row->stuphone}</td>
-            <td>{$row->stuemail}</td>
-           
-                <form action=\"editStudent.php\" method=\"post\">
-                    <input type=\"hidden\" name=\"icl_id\" value=\"$selectedIclID\">
-                </form>
+                echo "<tr>
+                    <td>{$row->stuname}</td>
+                    <td>{$row->icl_id}</td>
+                    <td>{$row->stunationality}</td>
+                    <td>{$row->stuuniversity}</td>
+                    <td>{$row->stuphone}</td>
+                    <td>{$row->stuemail}</td>
+                
+                        <form action=\"editStudent.php\" method=\"post\">
+                            <input type=\"hidden\" name=\"icl_id\" value=\"$selectedIclID\">
+                        </form>
          
         </tr>";
 }
