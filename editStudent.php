@@ -92,12 +92,6 @@ if ($identity !== 'admin' && $identity !== 'student') {
             echo "</div>";
             exit();
         }
-        echo"<script>
-        function refresh{
-            $refresh = 1;
-            setTimeout(function(){ location.reload(); }, 2000);
-        }
-        </script>";
     
         if ($student_basic_info->isNotEmpty()) {
             echo "<div id='edit_area' style='text-align: center;'>
@@ -164,12 +158,6 @@ if ($identity !== 'admin' && $identity !== 'student') {
     }
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveChanges'])) {
         // Handle form submission
-    
-        // Validate and sanitize input (for security)
-        // $stuname = isset($_POST["stuname"]) ? $_POST["stuname"] : null;
-        // $iclid = isset($_POST["iclid"]) ? $_POST["iclid"] : null;
-        // $stunationality = isset($_POST["stunationality"]) ? $_POST["stunationality"] : null;
-        // $stuuniversity = isset($_POST["stuuniversity"]) ? $_POST["stuuniversity"] : null;
         $stuphone = isset($_POST["stuphone"]) ? $_POST["stuphone"] : null;
         $stuemail = isset($_POST["stuemail"]) ? $_POST["stuemail"] : null;
 
@@ -200,21 +188,10 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 throw new \Exception("Record not found.");
             }
         
-            //Compare the existing values with the submitted values
-            // if (
-            //     $existingRecord->stuphone !== $stuphone ||
-            //     $existingRecord->stuemail !== $stuemail
-            // ) {
-            //     throw new \Exception("Concurrent update detected. Please refresh and try again.");
-            // }
-        
             // Update the record
             $result = DB::table('student')
                 ->where('icl_id', $selectedIclID)
                 ->update([
-                    // 'stuname' => $stuname,
-                    // 'stunationality' => $stunationality,
-                    // 'stuuniversity' => $stuuniversity,
                     'stuphone' => $stuphone,
                     'stuemail' => $stuemail,
                 ]);
@@ -227,11 +204,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 if ($identity === 'admin')
                     header("Location: adminSearchStudents.php");
                 exit();
-                // // Add JavaScript to refresh the page after 2 seconds
-                // if($refresh==1){
-                //     echo "<script>setTimeout(function(){ location.reload(); }, 2000);</script>";
-                // }
-                
+
             } else {
                 DB::rollBack();
                 throw new \Exception("Error updating record.");
