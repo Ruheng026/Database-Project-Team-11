@@ -66,6 +66,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 'student.stuuniversity',
                 'student.stuemail'
             )
+            ->lockForUpdate() // Apply a lock to prevent concurrent updates
             ->get();
 
         if ($student_basic_info->isNotEmpty()) {
@@ -193,7 +194,6 @@ if ($identity !== 'admin' && $identity !== 'student') {
             // Retrieve the current record for comparison
             $existingRecord = DB::table('student')
                 ->where('icl_id', $selectedIclID)
-                ->lockForUpdate() // Apply a lock to prevent concurrent updates
                 ->first();
         
             if (!$existingRecord) {
