@@ -19,7 +19,7 @@ $password = $_SESSION['password'];
 $identity = $_SESSION['identity'];
 
 // user is not admin, redirect to index.php
-if ($identity !== 'admin') {
+if ($identity !== 'admin' && $identity !== 'school') {
     header("Location: index.php");
     exit();
 }
@@ -139,7 +139,7 @@ DB::table('session_attendance')->lockForUpdate()->get();
                     $counter2 = 0;
                     echo "<tr><th>{$srow->date}</th><th>{$srow->starttime}~{$srow->endtime}</th>
                     <th>
-                    <select name=\"selectedIntlStatus[{$counter1}]\" id=\"selectedIntlStatus[{$counter1}]\" style=\"width:260px\" >";
+                    <select name=\"selectedIntlStatus[]\" id=\"selectedIntlStatus[]\" style=\"width:260px\" >";
                     foreach($attend_status as $row){
                         $selected =($_POST['selectedIntlStatus'][$counter1]??'')==$row->attendtype?'attendtype':'';
                         echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
@@ -150,7 +150,7 @@ DB::table('session_attendance')->lockForUpdate()->get();
                     </th>
 
                     <th>
-                    <select name=\"selectedLocStatus[{$counter2}]\" id=\"selectedLocStatus[{$counter2}]\" style=\"width:260px\" >";
+                    <select name=\"selectedLocStatus[]\" id=\"selectedLocStatus[]\" style=\"width:260px\" >";
                     foreach($attend_status as $row){
                         $selected =($_POST['selectedLocStatus'][$counter2]??'')==$row->attendtype?'attendtype':'';
                         echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
@@ -194,9 +194,12 @@ DB::table('session_attendance')->lockForUpdate()->get();
             $selectedIntlID = isset($_POST["intl_id"])?$_POST["intl_id"] : null;
             $selectedLocStatusArray = isset($_POST["selectedLocStatus"])? $_POST["selectedLocStatus"] : [];
             $selectedIntlStatusArray = isset($_POST["selectedIntlStatus"])? $_POST["selectedIntlStatus"] : [];
-            // foreach ($selectedIntlStatusArray as $selectedIntlStatus) {
+            // for ($i = 0; $i < count($selectedLocStatusArray); $i++) {
+            //     $selectedLocStatus = $selectedLocStatusArray[$i];
+            //     $selectedIntlStatus = $selectedIntlStatusArray[$i];
+                
             //     // Process each selected value
-            //     echo "Selected Intl Status: $selectedIntlStatus<br>";
+            //     echo "Selected Loc Status: $selectedLocStatus, Selected Intl Status: $selectedIntlStatus<br>";
             // }
             // echo "<h3 style='text-align: left;'>Session Info $selectedLocSessionId $selectedIntlSessionId</h3>";
             
@@ -218,6 +221,8 @@ DB::table('session_attendance')->lockForUpdate()->get();
                         ->first()->attend_no;
             
                     // Update records for each session
+                    // echo "{$selectedLocStatusNo}";
+                    // echo "{$selectedLocStatus}";
                     $result1 = DB::table('session_attendance')
                         ->where('session_id', $selectedLocSessionId)
                         ->where('icl_id', $selectedLocID)
