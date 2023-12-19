@@ -42,7 +42,7 @@ if ($identity !== 'admin') {
         <label for="search">School name or ID</label>
         <!-- <select name="search" id="search">
             <option>Name</option>
-            <option>School ID</option>
+            <option>Address</option>
         </select> -->
         <label for="school"></label>
         <input type="text" name="school" value="<?php echo isset($_POST['school']) ? htmlspecialchars($_POST['school']): ''; ?>">

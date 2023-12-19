@@ -64,7 +64,6 @@ if ($identity !== 'admin') {
         if($school_basic_info->isNotEmpty()){
             echo "<div style='text-align: right;'>
             <h3 style='text-align: center;'></h3>
-            <input type=\"submit\" name=\"Submit\" value=\"edit\">
             </div>";
             echo "<table>
             <tr><th>Name</th><th>Address</th></tr>";
@@ -268,14 +267,109 @@ if ($identity !== 'admin') {
 
             if($group_local->isNotEmpty()){
                 echo "<h3 style='text-align: left;'>Partner's Information </h3>";
+                
                 echo "<table>";
                 echo "<tr><th>Name</th><th>Group ID</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
                 foreach ($group_local as $row) {
+                    $selectedLoc = $row->icl_id;
+                    $selectedLocName = $row->stuname;
+                    echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
+                }
+            }else{
+
+            }
+
+            $group_international = DB::table('group_')
+            ->join('student',function($join){
+                $join->on('group_.intlicl_id','=','student.icl_id');
+            })
+            ->where('group_.group_id', $selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
+            ->select('student.*','group_.*')
+            ->get();
+
+            if($group_international->isNotEmpty()){
+                foreach ($group_international as $row) {
+                    $selectedIntl = $row->icl_id;
+                    $selectedIntlName = $row->stuname;
                     echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
                 }
                 echo "</table>";
             }else{
 
+            }
+                
+            $local_session = DB::table('session')
+            ->join('group_',function($join){
+                $join->on('session.group_id','=','group_.group_id');
+            })
+            ->join('session_attendance',function($join){
+                $join->on('session.session_id','=','session_attendance.session_id');
+            })
+            ->join('attend_status',function($join){
+                $join->on('session_attendance.attend_no','attend_status.attend_no');
+            })
+            ->where('group_.group_id',$selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
+            ->where('session_attendance.icl_id',$selectedLoc)
+            ->select('session.date','group_.starttime','group_.endtime','attend_status.attendtype as local')
+            ->get();
+
+            $intl_session = DB::table('session')
+            ->join('group_',function($join){
+                $join->on('session.group_id','=','group_.group_id');
+            })
+            ->join('session_attendance',function($join){
+                $join->on('session.session_id','=','session_attendance.session_id');
+            })
+            ->join('attend_status',function($join){
+                $join->on('session_attendance.attend_no','attend_status.attend_no');
+            })
+            ->where('group_.group_id',$selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
+            ->where('session_attendance.icl_id',$selectedIntl)
+            ->select('session.date','group_.starttime','group_.endtime','attend_status.attendtype as intl')
+            ->get();
+            
+            
+            if ($local_session->isNotEmpty() || $intl_session->isNotEmpty()) {
+                echo "<h3 style='text-align: left;'>Session Info </h3>";
+                echo"<form action=\"editSchool.php\" method=\"post\">
+                <input type=\"hidden\" name=\"group_id\" value=\"$selectedGroupID\">
+                <input type=\"hidden\" name=\"local_id\" value=\"$selectedLoc\">
+                <input type=\"hidden\" name=\"intl_id\" value=\"$selectedIntl\">
+                <input type=\"hidden\" name=\"group_semester\" value=\"$selectedGroupSemester\">
+                <input type=\"submit\" value=\"Edit\">
+                </form>
+                <table>";
+                
+                echo "<tr><th>Date</th><th>Time</th><th>Attendance of {$selectedIntlName}(International Student)</th><th>Attendance of {$selectedLocName}(Local Student)</th></tr>";
+                // Iterate over the international sessions
+                foreach ($intl_session as $intl_row) {
+                    $local_row = $local_session->firstWhere('date', $intl_row->date);
+                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th><th>{$intl_row->intl}</th>";
+                    
+                    // Check if corresponding international session exists
+                    if ($intl_row) {
+                        echo "<th>{$intl_row->intl}</th></tr>";
+                    } else {
+                        echo "<th>N/A</th></tr>";
+                    }
+                }
+                // If there are local sessions without corresponding international sessions
+                foreach ($local_session as $local_row) {
+                    $intl_row = $intl_session->firstWhere('date', $local_row->date);
+            
+                    // Check if corresponding local session already printed
+                    if (!$intl_row) {
+                        echo "<tr><th>{$local_row->date}</th><th>N/A</th><th>N/A</th><th>{$local_row->local}</th></tr>";
+                    }
+                }
+            
+                echo "</table>";
+            } else {
+                // Handle the case where both $local_session and $intl_session are empty
+                echo "No data available.";
             }
         }
     
@@ -283,3 +377,4 @@ if ($identity !== 'admin') {
 </div>
 </body>
 </html>
+
