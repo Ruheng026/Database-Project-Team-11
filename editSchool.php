@@ -86,189 +86,58 @@ if ($identity !== 'admin') {
             ->where('session_attendance.icl_id',$selectedIntl)
             ->select('session.date','group_.starttime','group_.endtime','attend_status.attendtype as intl')
             ->get();
-            
-        ?>
-    </form>
-    <?php
-        $refresh = 0;
-        // 1.1 student basic info
-        $student_basic_info = DB::table('student')
-            ->where('icl_id', $selectedIclID)
-            ->select(
-                'student.icl_id' ,
-                'student.stunationality',
-                'student.stutype',
-                'student.studegree',
-                'student.stuname',
-                'student.stusex',
-                'student.stuphone',
-                'student.stuuniversity',
-                'student.stuemail'
-            )
+
+            $studentLoc = DB::table('student')
+            ->where('student.icl_id',$selectedLoc)
+            ->select('student.*')
             ->get();
+            foreach($studentLoc as $row){
+                $selectedLocName = $row->stuname;
+            }
+            $studentIntl = DB::table('student')
+            ->where('student.icl_id',$selectedIntl)
+            ->select('student.*')
+            ->get();
+            foreach($studentLoc as $row){
+                $selectedIntlName = $row->stuname;
+            }
+            if ($local_session->isNotEmpty() || $intl_session->isNotEmpty()) {
+                echo "<h3 style='text-align: left;'>Session Info </h3>";
 
-        if ($student_basic_info->isNotEmpty()) {
-            
-            echo "<div style='text-align: right;'>
-                <h3 style='text-align: center;'>Student Basic Information</h3>
-                </div>";
-            
-            echo "<table>";
-            
-            echo "<tr><th>Name</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
-            foreach ($student_basic_info as $row) {
-                $selectedName = $row->stuname;
-                echo "<tr><td>{$row->stuname}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
-            }
-            echo "<input type=\"hidden\" name=\"icl_id\" value= \"$row->icl_id\">";
-            echo "<input type=\"hidden\" name=\"display\" value= \"editArea.style.display\">";
-            
-            echo "</table>";
-            
-        } else {
-            echo "<div style='text-align: center;'>";
-            echo "No student found.";
-            echo "</div>";
-            exit();
-        }
-        echo"<script>
-        function refresh{
-            $refresh = 1;
-            setTimeout(function(){ location.reload(); }, 2000);
-        }
-        </script>";
-    
-        if ($student_basic_info->isNotEmpty()) {
-            echo "<div id='edit_area' style='text-align: center;'>
-                    <h3 style='text-align: center;'>Edit Student Basic Information</h3>
-            <form accept-charset='UTF-8' method='post' action='editStudent.php'>";  // Add your update script file in the action attribute
-            echo "<div style='text-align: center;'>";
-            echo "<table style='text-align: center;'>";
-            // Display table headers
-            echo "<tr><th>Edit Information </th>";
-            foreach ($student_basic_info as $row) {
-                echo "<th>{$row->icl_id},{$row->stuname}</th>";
-            }
-            echo "</tr>";
-        
-            // Display table rows
-            echo "<tr><th>Name</th>";
-            foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stuname'  style='width: 200px;' value='{$row->stuname}' ></td>";
-            }
-            echo "</tr>";
-
-            echo "<tr><th>ICL ID</th>";
-            foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='iclid' style='width: 200px;' value='{$row->icl_id}'></td>";
-            }
-            echo "</tr>";
-        
-            echo "<tr><th>Nationality</th>";
-            foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stunationality' style='width: 200px;' value='{$row->stunationality}'></td>";
-            }
-            echo "</tr>";
-        
-            echo "<tr><th>University</th>";
-            foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stuuniversity' style='width: 200px;' value='{$row->stuuniversity}'></td>";
-            }
-            echo "</tr>";
-        
-            echo "<tr><th>Phone</th>";
-            foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stuphone' style='width: 200px;' value='{$row->stuphone}'></td>";
-            }
-            echo "</tr>";
-        
-            echo "<tr><th>Email</th>";
-            foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stuemail' style='width: 200px;' value='{$row->stuemail}'></td>";
-            }
-            echo "</tr>";
-        
-            echo "</table>";
-            echo "</div>";
-            echo "<input type='submit' name='Submit' value='Save Changes' style='width: 120px;' onclick = refresh()>";
-            echo "</form>";
-            echo "</div>";
-        } else {
-            echo "<div style='text-align: center;'>";
-            echo "No student found.";
-            echo "</div>";
-            exit();
-        }
-        
-    }
-    
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Handle form submission
-    
-        // Validate and sanitize input (for security)
-        $stuname = isset($_POST["stuname"]) ? $_POST["stuname"] : null;
-        $iclid = isset($_POST["iclid"]) ? $_POST["iclid"] : null;
-        $stunationality = isset($_POST["stunationality"]) ? $_POST["stunationality"] : null;
-        $stuuniversity = isset($_POST["stuuniversity"]) ? $_POST["stuuniversity"] : null;
-        $stuphone = isset($_POST["stuphone"]) ? $_POST["stuphone"] : null;
-        $stuemail = isset($_POST["stuemail"]) ? $_POST["stuemail"] : null;
-    
-        try {
-            DB::beginTransaction();
-        
-            // Retrieve the current record for comparison
-            $existingRecord = DB::table('student')
-                ->where('icl_id', $iclid)
-                ->lockForUpdate() // Apply a lock to prevent concurrent updates
-                ->first();
-        
-            if (!$existingRecord) {
-                throw new \Exception("Record not found.");
-            }
-        
-            //Compare the existing values with the submitted values
-            if (
-                $existingRecord->stuname !== $stuname ||
-                $existingRecord->stunationality !== $stunationality ||
-                $existingRecord->stuuniversity !== $stuuniversity ||
-                $existingRecord->stuphone !== $stuphone ||
-                $existingRecord->stuemail !== $stuemail
-            ) {
-                throw new \Exception("Concurrent update detected. Please refresh and try again.");
-            }
-        
-            // Update the record
-            $result = DB::table('student')
-                ->where('icl_id', $iclid)
-                ->update([
-                    'stuname' => $stuname,
-                    'stunationality' => $stunationality,
-                    'stuuniversity' => $stuuniversity,
-                    'stuphone' => $stuphone,
-                    'stuemail' => $stuemail,
-                ]);
-        
-            if ($result) {
-                DB::commit();
-                echo "Update successful!";
-                // Add JavaScript to refresh the page after 2 seconds
-                if($refresh==1){
-                    echo "<script>setTimeout(function(){ location.reload(); }, 2000);</script>";
-                }
+                echo"<table>";
                 
+                echo "<tr><th>Date</th><th>Time</th><th>Attendance of {$selectedIntlName}(International Student)</th><th>Attendance of {$selectedLocName}(Local Student)</th></tr>";
+                // Iterate over the international sessions
+                foreach ($intl_session as $intl_row) {
+                    $local_row = $local_session->firstWhere('date', $intl_row->date);
+                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th><th>{$intl_row->intl}</th>";
+                    
+                    // Check if corresponding international session exists
+                    if ($intl_row) {
+                        echo "<th>{$intl_row->intl}</th></tr>";
+                    } else {
+                        echo "<th>N/A</th></tr>";
+                    }
+                }
+                // If there are local sessions without corresponding international sessions
+                foreach ($local_session as $local_row) {
+                    $intl_row = $intl_session->firstWhere('date', $local_row->date);
+            
+                    // Check if corresponding local session already printed
+                    if (!$intl_row) {
+                        echo "<tr><th>{$local_row->date}</th><th>N/A</th><th>N/A</th><th>{$local_row->local}</th></tr>";
+                    }
+                }
+            
+                echo "</table>";
             } else {
-                throw new \Exception("Error updating record.");
+                // Handle the case where both $local_session and $intl_session are empty
+                echo "No data available.";
             }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            echo $e->getMessage();
         }
-    
+        ?>
 
-    }else{
-
-    }
-    ?>
+    </form>
     
 
 </div>

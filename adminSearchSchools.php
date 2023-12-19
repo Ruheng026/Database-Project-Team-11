@@ -272,6 +272,7 @@ if ($identity !== 'admin') {
                 echo "<tr><th>Name</th><th>Group ID</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
                 foreach ($group_local as $row) {
                     $selectedLoc = $row->icl_id;
+                    $selectedLocName = $row->stuname;
                     echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
                 }
             }else{
@@ -290,6 +291,7 @@ if ($identity !== 'admin') {
             if($group_international->isNotEmpty()){
                 foreach ($group_international as $row) {
                     $selectedIntl = $row->icl_id;
+                    $selectedIntlName = $row->stuname;
                     echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
                 }
                 echo "</table>";
@@ -340,12 +342,12 @@ if ($identity !== 'admin') {
                 <input type=\"submit\" value=\"Edit\">
                 </form>
                 <table>";
-                echo "<tr><th>Date</th><th>Time</th><th>Attendance of Local Student</th><th>Attendance of International Student</th></tr>";
-            
-                // Iterate over the local sessions
-                foreach ($local_session as $local_row) {
-                    $intl_row = $intl_session->firstWhere('date', $local_row->date);
-                    echo "<tr><th>{$local_row->date}</th><th>{$local_row->starttime}~{$local_row->endtime}</th><th>{$local_row->local}</th>";
+                
+                echo "<tr><th>Date</th><th>Time</th><th>Attendance of {$selectedIntlName}(International Student)</th><th>Attendance of {$selectedLocName}(Local Student)</th></tr>";
+                // Iterate over the international sessions
+                foreach ($intl_session as $intl_row) {
+                    $local_row = $local_session->firstWhere('date', $intl_row->date);
+                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th><th>{$intl_row->intl}</th>";
                     
                     // Check if corresponding international session exists
                     if ($intl_row) {
@@ -354,14 +356,13 @@ if ($identity !== 'admin') {
                         echo "<th>N/A</th></tr>";
                     }
                 }
-            
-                // If there are international sessions without corresponding local sessions
-                foreach ($intl_session as $intl_row) {
-                    $local_row = $local_session->firstWhere('date', $intl_row->date);
+                // If there are local sessions without corresponding international sessions
+                foreach ($local_session as $local_row) {
+                    $intl_row = $intl_session->firstWhere('date', $local_row->date);
             
                     // Check if corresponding local session already printed
-                    if (!$local_row) {
-                        echo "<tr><th>{$intl_row->date}</th><th>N/A</th><th>N/A</th><th>{$intl_row->intl}</th></tr>";
+                    if (!$intl_row) {
+                        echo "<tr><th>{$local_row->date}</th><th>N/A</th><th>N/A</th><th>{$local_row->local}</th></tr>";
                     }
                 }
             

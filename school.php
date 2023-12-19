@@ -38,9 +38,10 @@ if ($identity !== 'school') {
         <a href="index.php" class="search-link">Home</a>
     </div>
     <form action="school.php" method="post">
-        <?php
-            $selectedSchoolID=$password;
-            $school_basic_info = DB::table('school')
+    <?php
+        //school basic info
+        $selectedSchoolID=$password;
+        $school_basic_info = DB::table('school')
             ->where('school_id',$selectedSchoolID)
             ->select(
                 'school.school_id',
@@ -50,7 +51,9 @@ if ($identity !== 'school') {
             )
             ->get();
         if($school_basic_info->isNotEmpty()){
-            
+            echo "<div style='text-align: right;'>
+            <h3 style='text-align: center;'></h3>
+            </div>";
             echo "<table>
             <tr><th>Name</th><th>Address</th></tr>";
             foreach ($school_basic_info as $row){
@@ -62,10 +65,14 @@ if ($identity !== 'school') {
             echo"<div style='text-align: center;'>No school found.</div>";
             exit();
         }   
-        ?>
-        <form action="school.php" method="post">
-        <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
-        <?php
+    
+    ?>
+    
+    <!-- search contact, trip, trip participant -->
+    <h3 style='text-align: left;'>Search for Contact, Trips, Trip Participants Information</h3>
+    <form action="school.php" method="post">
+    <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
+    <?php
         $semesters=DB::table('semester_contact')
             ->where('school_id',$selectedSchoolID)
             ->distinct()
@@ -75,21 +82,22 @@ if ($identity !== 'school') {
                 'semester_contact.conname'
             )
             ->get();
-            ?>
-        <label for="selectSemester">Semester:</label>
-        <select name="selectSemester" id="selectSemester">
+    ?>
+    <label for="selectSemester">Semester:</label>
+    <select name="selectSemester" id="selectSemester">
         <?php
             foreach($semesters as $row){
                 $selected = (($_POST['selectSemester']??"")==$row->semester)?'selected':'';
                 echo "<option value='{$row->semester}'{$selected}>{$row->semester}</option>";
             }
-            echo "<input type=\"hidden\" name=\"school_id\" value=\"$row->school_id\">";
+            echo "<input type=\"hidden\" name=\"school_id\" value=\"$selectedSchoolID\">";
         ?>  
-        </select>
-        <input type="submit" value="Search">
-        </div>
-        <?php
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    </select>
+    <input type="submit" name="firstForm" value="Search">
+    </div>
+    </form>
+    <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['firstForm'])) {
             $selectedSemester = $_POST['selectSemester']??"";
             if($selectedSemester === ""){
                 echo"<div style='text-align: center;'>No semester selected.</div>";
@@ -189,11 +197,12 @@ if ($identity !== 'school') {
                 echo "</div>";
             }
         }
-        
     ?>
-        </form>
-        <form action="school.php" method="post">
-        <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
+
+    <!-- second form: semester, group id -->
+    <h3 style='text-align: left;'>Search for Group's Information </h3>
+    <form action="school.php" method="post">
+    <div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>
         <label for="groupSemester">Semester:</label>
         <select name="groupSemester" id="groupSemester">
             <?php
@@ -205,53 +214,56 @@ if ($identity !== 'school') {
                     'group_.group_id')
                 ->get();
                 foreach($group_semesters as $row){
-                    $semester = ($_POST['groupSemester']??'')==$row->semester?'semester':'';
-                    echo "<option value='{$row->semester}'{$semester}>{$row->semester}</option>";
+                    $selected_semester = ($_POST['groupSemester']??'')==$row->semester?'semester':'';
+                    echo "<option value='{$row->semester}'{$selected_semester}>{$row->semester}</option>";
                 }
-                echo "<input type=\"hidden\" name=\"school_id\" value=\"$row->school_id\">";
+                echo "<input type=\"hidden\" name=\"school_id\" value=\"$selectedSchoolID\">";
             ?>
         </select>
         <label for="selectGroup">Group ID:</label>
         <select name="selectGroup" id="selectGroup">
             <?php
                 foreach($group_semesters as $row){
-                    $group_id = ($_POST['selectGroup']??'')==$row->group_id?'group_id':'';
-                    echo "<option value='{$row->group_id}'{$group_id}>{$row->group_id}</option>";
+                    $selected_group_id = ($_POST['selectGroup']??'')==$row->group_id?'group_id':'';
+                    echo "<option value='{$row->group_id}'{$selected_group_id}>{$row->group_id}</option>";
                 }
-                echo "<input type=\"hidden\" name=\"school_id\" value=\"$row->school_id\">";
+                echo "<input type=\"hidden\" name=\"school_id\" value=\"$selectedSchoolID\">";
             ?>  
         </select>
-        <input type="submit" value="Search">
-        </div> 
-        <?php
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $selectedGroupSemester = $_POST['groupSemester']??'';
-            $selectedGroupID = $_POST['selectGroup']??'';
-            // if($selectedGroupSemester === ""){
-            //     echo"<div style='text-align: center;'>No semester selected.</div>";
-            //     exit();
-            // }
-            // if($selectedGroupID === ""){
-            //     echo"<div style='text-align: center;'>No group selected.</div>";
-            //     exit();
-            // }
+        <input type="submit" name="secondForm" value="Search">
+    </div>
+    </form>
+    <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['secondForm'])) {
+            $selectedGroupSemester = ($_POST['groupSemester']) ?? $selectedSemester;
+            $selectedGroupID = $_POST['selectGroup'] ?? '';
+            if($selectedGroupSemester === ""){
+                echo"<div style='text-align: center;'>No semester selected.</div>";
+                exit();
+            }
+            if($selectedGroupID === ""){
+                echo"<div style='text-align: center;'>No group selected.</div>";
+                exit();
+            }
             $group_local = DB::table('group_')
             ->join('student',function($join){
                 $join->on('group_.locicl_id','=','student.icl_id');
             })
-            ->where('group_.group_id', $group_id)
-            ->where('group_.semester', $semester)
+            ->where('group_.group_id', $selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
             ->select('student.*','group_.*')
             ->get();
 
             if($group_local->isNotEmpty()){
                 echo "<h3 style='text-align: left;'>Partner's Information </h3>";
+                
                 echo "<table>";
-                echo "<tr><th>Name</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
+                echo "<tr><th>Name</th><th>Group ID</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
                 foreach ($group_local as $row) {
+                    $selectedLoc = $row->icl_id;
+                    $selectedLocName = $row->stuname;
                     echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
                 }
-                echo "</table>";
             }else{
 
             }
@@ -260,26 +272,97 @@ if ($identity !== 'school') {
             ->join('student',function($join){
                 $join->on('group_.intlicl_id','=','student.icl_id');
             })
-            ->where('group_.group_id', $group_id)
-            ->where('group_.semester', $semester)
+            ->where('group_.group_id', $selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
             ->select('student.*','group_.*')
             ->get();
 
             if($group_international->isNotEmpty()){
-                echo "<h3 style='text-align: left;'>Partner's Information </h3>";
-                echo "<table>";
-                echo "<tr><th>Name</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
                 foreach ($group_international as $row) {
+                    $selectedIntl = $row->icl_id;
+                    $selectedIntlName = $row->stuname;
                     echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
                 }
                 echo "</table>";
             }else{
+
+            }
                 
+            $local_session = DB::table('session')
+            ->join('group_',function($join){
+                $join->on('session.group_id','=','group_.group_id');
+            })
+            ->join('session_attendance',function($join){
+                $join->on('session.session_id','=','session_attendance.session_id');
+            })
+            ->join('attend_status',function($join){
+                $join->on('session_attendance.attend_no','attend_status.attend_no');
+            })
+            ->where('group_.group_id',$selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
+            ->where('session_attendance.icl_id',$selectedLoc)
+            ->select('session.date','group_.starttime','group_.endtime','attend_status.attendtype as local')
+            ->get();
+
+            $intl_session = DB::table('session')
+            ->join('group_',function($join){
+                $join->on('session.group_id','=','group_.group_id');
+            })
+            ->join('session_attendance',function($join){
+                $join->on('session.session_id','=','session_attendance.session_id');
+            })
+            ->join('attend_status',function($join){
+                $join->on('session_attendance.attend_no','attend_status.attend_no');
+            })
+            ->where('group_.group_id',$selectedGroupID)
+            ->where('group_.semester', $selectedGroupSemester)
+            ->where('session_attendance.icl_id',$selectedIntl)
+            ->select('session.date','group_.starttime','group_.endtime','attend_status.attendtype as intl')
+            ->get();
+            
+            
+            if ($local_session->isNotEmpty() || $intl_session->isNotEmpty()) {
+                echo "<h3 style='text-align: left;'>Session Info </h3>";
+                echo"<form action=\"editSchool.php\" method=\"post\">
+                <input type=\"hidden\" name=\"group_id\" value=\"$selectedGroupID\">
+                <input type=\"hidden\" name=\"local_id\" value=\"$selectedLoc\">
+                <input type=\"hidden\" name=\"intl_id\" value=\"$selectedIntl\">
+                <input type=\"hidden\" name=\"group_semester\" value=\"$selectedGroupSemester\">
+                <input type=\"submit\" value=\"Edit\">
+                </form>
+                <table>";
+                
+                echo "<tr><th>Date</th><th>Time</th><th>Attendance of {$selectedIntlName}(International Student)</th><th>Attendance of {$selectedLocName}(Local Student)</th></tr>";
+                // Iterate over the international sessions
+                foreach ($intl_session as $intl_row) {
+                    $local_row = $local_session->firstWhere('date', $intl_row->date);
+                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th><th>{$intl_row->intl}</th>";
+                    
+                    // Check if corresponding international session exists
+                    if ($intl_row) {
+                        echo "<th>{$intl_row->intl}</th></tr>";
+                    } else {
+                        echo "<th>N/A</th></tr>";
+                    }
+                }
+                // If there are local sessions without corresponding international sessions
+                foreach ($local_session as $local_row) {
+                    $intl_row = $intl_session->firstWhere('date', $local_row->date);
+            
+                    // Check if corresponding local session already printed
+                    if (!$intl_row) {
+                        echo "<tr><th>{$local_row->date}</th><th>N/A</th><th>N/A</th><th>{$local_row->local}</th></tr>";
+                    }
+                }
+            
+                echo "</table>";
+            } else {
+                // Handle the case where both $local_session and $intl_session are empty
+                echo "No data available.";
             }
         }
     
     ?>
-        </form>
 </div>
 </body>
 </html>
