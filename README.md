@@ -100,22 +100,28 @@ Access the system via **`http://localhost/your-project-folder/`** in your web br
 - **student**: [ ID=松浦明日香, PASSWORD=53 ]
 - **school**: [ ID=七賢國中, PASSWORD=523504 ]
 
-### **Public Interface**
+### **Before Log In**
 
 - Navigate to **`publicStatistics.php`** by clicking the **`Public Statistics`** button for the Public Search interface.
 - Navigate to **`login.php`** by clicking the **`Login`** button.
-- If logged in, navigate to **`logout.php`** and then **`index.php`** by clicking the **`Log Out`** button in all interfaces.
-- If not already at **index.php**, navigate to **`index.php`** by clicking the **`Home`** button in all interfaces.
 
-### **Student Interface**
+### **After Log In**
+
+#### **All Interface**
+
+- Navigate to **`publicStatistics.php`** by clicking the **`Public Statistics`** button for the Public Search interface.
+- Navigate to **`logout.php`** and then **`index.php`** by clicking the **`Log Out`** button.
+- If not already at **`index.php`**, navigate to **`index.php`** by clicking the **`Home`** button.
+
+#### **Student Interface**
 
 Navigate to **`student.php`** by clicking the **`My Page`** button for the Student Search interface.
 
-### **School Interface**
+#### **School Interface**
 
 Navigate to **`school.php`** by clicking the **`My Page`** button for the School Search interface.
 
-### **Admin Interface**
+#### **Admin Interface**
 
 - Navigate to **`adminStudents.php`** by clicking the **`Admin Students`** button for the Administrator Student Search interface.
 - Navigate to **`adminSchools.php`** by clicking the **`Admin Schools`** button for the Administrator School Search interface.
