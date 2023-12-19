@@ -7,12 +7,19 @@
 
 ## File Structure
 
-- **`README`**: Provides setup instructions and information about the project.
-- **`index.php`**: The home page of the ICL System that links to the user and admin interfaces.
+- **`README.md`**: Provides setup instructions and information about the project.
+
 - **`composer.json`**: Defines the project's PHP dependencies and other metadata.
 - **`composer.lock`**: Lock file to record the exact versions of dependencies installed.
 - **`eloquent.php`**: Sets up the Eloquent ORM configuration and initializes the database connection.
 - **`style.css`**: Contains the CSS styles for the project's frontend.
+- **`db_password.txt`**: Please create a **`db_password.txt`** and put your password in it.
+- **`.gitignore`**
+
+- **`ICL_backup.sql`**: The backup file for the database.
+- **`sql queries`**: The sql queries that our system will use.
+
+- **`index.php`**: The home page of the ICL System that links to the user and admin interfaces.
 - **`login.php`**: 登入，開始 session，記錄使用者名稱（ID）、ID（password）、身分別（admin / student / school）
 - **`logout.php`**: 登出，結束 session，回到 `index.php`
 - **`publicStatistics.php`**: ICL 公開的資訊，包含按國籍排序參與者數量、合作的學校、學校參與的學期與 session 資料等。
@@ -21,13 +28,15 @@
 - **`adminStatistics.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 overall attendance rate、attendance rate 最低的學生、no show rate 最高的 trips、課程資訊等
 - **`adminTrips.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 trips 的資料，包含日期、拜訪的學校、參與的學生等
 
-[to implement]
 - **`adminStudents.php`**: admin 查詢 students
-- **`student.php`**: student 的 my page
+- **`adminSearchStudents.php`**: admin 查詢 students
+- **`student.php`**: student 的 My Page，可以查看並編輯個人資訊
+- **`editStudent.php`**: admin 或 student 編輯 student 個人資訊
 
-[to implement]
 - **`adminSchools.php`**: admin 查詢 schools
-- **`school.php`**: school 的 my page
+- **`adminSearchStudents.php`**: admin 查詢 schools
+- **`school.php`**: school 的 My Page，可以查看並編輯學校資訊
+- **`editSchool.php`**: admin 或 school 編輯學校資訊
 
 
 
