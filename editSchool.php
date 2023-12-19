@@ -72,7 +72,7 @@ DB::table('session_attendance')->lockForUpdate()->get();
             })
             ->where('group_.group_id',$selectedGroupID)
             ->where('group_.semester', $selectedGroupSemester)
-            ->select('session.date','group_.starttime','group_.endtime','group_.locicl_id','group_.intlicl_id','attend_status.attendtype as local')
+            ->select('session.session_id', 'session.date','group_.starttime','group_.endtime','group_.locicl_id','group_.intlicl_id','attend_status.attendtype as local')
             ->distinct()
             ->get();
 
@@ -135,28 +135,34 @@ DB::table('session_attendance')->lockForUpdate()->get();
                 echo"<table>";
                 echo "<tr><th>Date</th><th>Time</th><th>Attendance of {$selectedIntlName}(International Student)</th><th>Attendance of {$selectedLocName} (Local Student)</th></tr>";
                 foreach ($the_session as $srow) {
+                    $counter1 = 0;
+                    $counter2 = 0;
                     echo "<tr><th>{$srow->date}</th><th>{$srow->starttime}~{$srow->endtime}</th>
                     <th>
-                    <select name=\"selectedIntlStatus\" id=\"selectedIntlStatus\" style=\"width:260px\" >";
+                    <select name=\"selectedIntlStatus[{$counter1}]\" id=\"selectedIntlStatus[{$counter1}]\" style=\"width:260px\" >";
                     foreach($attend_status as $row){
-                        $selected =($_POST['selectedIntlStatus']??'')==$row->attendtype?'attendtype':'';
+                        $selected =($_POST['selectedIntlStatus'][$counter1]??'')==$row->attendtype?'attendtype':'';
                         echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
+                        $counter1++;
                     }
                     echo"
                     </select>
                     </th>
 
                     <th>
-                    <select name=\"selectedLocStatus\" id=\"selectedLocStatus\" style=\"width:260px\" >";
+                    <select name=\"selectedLocStatus[{$counter2}]\" id=\"selectedLocStatus[{$counter2}]\" style=\"width:260px\" >";
                     foreach($attend_status as $row){
-                        $selected =($_POST['selectedLocStatus']??'')==$row->attendtype?'attendtype':'';
+                        $selected =($_POST['selectedLocStatus'][$counter2]??'')==$row->attendtype?'attendtype':'';
                         echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
+                        $counter2++;
                     }
                     $_POST['selectedSessionId'] = $srow->session_id;
-                        $_POST['local_id'] = $srow->locicl_id;
-                        $_POST['intl_id'] = $srow->intlicl_id;
-                        $_POST['selectedLocDate'] = $srow->date;
-                        $_POST['selectedLocStartTime'] = $srow->starttime;
+                    $_POST['local_id'] = $srow->locicl_id;
+                    $_POST['intl_id'] = $srow->intlicl_id;
+                    $_POST['selectedLocDate'] = $srow->date;
+                    $_POST['selectedLocStartTime'] = $srow->starttime;
+                    // $_POST['selectedIntlStatus'] = array_values($_POST['selectedIntlStatus']);
+                    // $_POST['selectedLocStatus'] = array_values($_POST['selectedLocStatus']);
                     echo"
                     </select>
                     </th>";
@@ -186,47 +192,62 @@ DB::table('session_attendance')->lockForUpdate()->get();
             $selectedIntlSessionId = isset($_POST['selectedSessionId']) ? $_POST["selectedSessionId"] : null;
             $selectedLocID = isset($_POST["local_id"])? $_POST["local_id"] : null;
             $selectedIntlID = isset($_POST["intl_id"])?$_POST["intl_id"] : null;
-            $selectedLocStatus = isset($_POST["selectedLocStatus"])? $_POST["selectedLocStatus"] : null;
-            $selectedIntlStatus = isset($_POST["selectedIntlStatus"])? $_POST["selectedIntlStatus"] : null;
-            echo "<h3 style='text-align: left;'>Session Info $selectedLocSessionId $selectedIntlSessionId</h3>";
+            $selectedLocStatusArray = isset($_POST["selectedLocStatus"])? $_POST["selectedLocStatus"] : [];
+            $selectedIntlStatusArray = isset($_POST["selectedIntlStatus"])? $_POST["selectedIntlStatus"] : [];
+            // foreach ($selectedIntlStatusArray as $selectedIntlStatus) {
+            //     // Process each selected value
+            //     echo "Selected Intl Status: $selectedIntlStatus<br>";
+            // }
+            // echo "<h3 style='text-align: left;'>Session Info $selectedLocSessionId $selectedIntlSessionId</h3>";
             
             try {
-                $selectedLocStatusNo = DB::table('attend_status')
-                ->where('attendtype', $selectedLocStatus)
-                ->select('attend_no')
-                ->first();
-                $selectedLocStatusNo = $selectedLocStatusNo->attend_no;
-                $selectedIntlStatusNo = DB::table('attend_status')
-                ->where('attendtype', $selectedIntlStatus)
-                ->select('attend_no')
-                ->first();
-                $selectedIntlStatusNo = $selectedIntlStatusNo->attend_no; 
+                // Loop through both arrays simultaneously
+                for ($i = 0; $i < count($selectedLocStatusArray); $i++) {
+                    $selectedLocStatus = $selectedLocStatusArray[$i];
+                    $selectedIntlStatus = $selectedIntlStatusArray[$i];
             
-                // Update the record
-                $result1 = DB::table('session_attendance')
-                ->where('session_id', $selectedLocSessionId)
-                ->where('icl_id', $selectedLocID)
-                ->update(['attend_no' => $selectedLocStatusNo]);
-        
-                $result2 = DB::table('session_attendance')
-                ->where('session_id', $selectedIntlSessionId)
-                ->where('icl_id', $selectedIntlID)
-                ->update(['attend_no' => $selectedIntlStatusNo]);
-                
-                if ($result1 || $result2) {
-                    DB::commit();
-                    echo "Update successful!";
-                    if ($identity === 'school')
-                        header("Location: school.php");
-                    if ($identity === 'admin')
-                        header("Location: adminSchool.php");
-                    exit();
-    
-                } else {
-                    throw new \Exception("Error updating record.");
-                    DB::rollBack();
+                    // Fetch attend_no for each status
+                    $selectedLocStatusNo = DB::table('attend_status')
+                        ->where('attendtype', $selectedLocStatus)
+                        ->select('attend_no')
+                        ->first()->attend_no;
+            
+                    $selectedIntlStatusNo = DB::table('attend_status')
+                        ->where('attendtype', $selectedIntlStatus)
+                        ->select('attend_no')
+                        ->first()->attend_no;
+            
+                    // Update records for each session
+                    $result1 = DB::table('session_attendance')
+                        ->where('session_id', $selectedLocSessionId)
+                        ->where('icl_id', $selectedLocID)
+                        ->update(['attend_no' => $selectedLocStatusNo]);
+            
+                    $result2 = DB::table('session_attendance')
+                        ->where('session_id', $selectedIntlSessionId)
+                        ->where('icl_id', $selectedIntlID)
+                        ->update(['attend_no' => $selectedIntlStatusNo]);
+            
+                    // Check if any update fails
+                    if (!$result1 || !$result2) {
+                        throw new \Exception("Error updating record.");
+                    }
                 }
+            
+                // If all updates are successful, commit the transaction
+                DB::commit();
+                echo "Update successful!";
+                
+                // Redirect based on $identity
+                // if ($identity === 'school') {
+                //     header("Location: school.php");
+                // } elseif ($identity === 'admin') {
+                //     header("Location: adminSchool.php");
+                // }
+                exit();
+            
             } catch (\Exception $e) {
+                // If any error occurs, rollback the transaction
                 echo $e->getMessage();
                 DB::rollBack();
             }
