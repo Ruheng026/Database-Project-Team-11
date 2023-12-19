@@ -23,6 +23,10 @@ if ($identity !== 'admin' && $identity !== 'student') {
     header("Location: index.php");
     exit();
 }
+
+DB::beginTransaction();
+DB::table('student')->lockForUpdate()->get();
+
 ?>
 <meta charset="UTF-8">
 <!DOCTYPE html>
@@ -90,8 +94,15 @@ if ($identity !== 'admin' && $identity !== 'student') {
             echo "<div style='text-align: center;'>";
             echo "No student found.";
             echo "</div>";
+            DB::rollBack();
             exit();
         }
+        // echo"<script>
+        // function refresh{
+        //     $refresh = 1;
+        //     setTimeout(function(){ location.reload(); }, 2000);
+        // }
+        // </script>";
     
         if ($student_basic_info->isNotEmpty()) {
             echo "<div id='edit_area' style='text-align: center;'>
@@ -152,6 +163,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
             echo "<div style='text-align: center;'>";
             echo "No student found.";
             echo "</div>";
+            DB::rollBack();
             exit();
         }
         
@@ -165,6 +177,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
         if (!preg_match('/^\d{10}$/', $stuphone)) {
             echo "Invalid phone number format. Please enter a 10-digit number.";
             // throw new \Exception("Invalid phone number format. Please enter a 10-digit number.");
+            DB::rollBack();
             exit();
         }
 
@@ -172,16 +185,14 @@ if ($identity !== 'admin' && $identity !== 'student') {
         if (strlen($stuemail) > 30) {
             echo "Email length exceeds the maximum allowed characters (30).";
             // throw new \Exception("Email length exceeds the maximum allowed characters (30).");
+            DB::rollBack();
             exit();
         }
     
         try {
-            DB::beginTransaction();
-        
             // Retrieve the current record for comparison
             $existingRecord = DB::table('student')
                 ->where('icl_id', $selectedIclID)
-                ->lockForUpdate() // Apply a lock to prevent concurrent updates
                 ->first();
         
             if (!$existingRecord) {
@@ -202,16 +213,16 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 if ($identity === 'student')
                     header("Location: student.php");
                 if ($identity === 'admin')
-                    header("Location: adminSearchStudents.php");
+                    header("Location: adminStudents.php");
                 exit();
 
             } else {
-                DB::rollBack();
                 throw new \Exception("Error updating record.");
+                DB::rollBack();
             }
         } catch (\Exception $e) {
-            DB::rollBack();
             echo $e->getMessage();
+            DB::rollBack();
         }
     
 
