@@ -19,7 +19,7 @@ $password = $_SESSION['password'];
 $identity = $_SESSION['identity'];
 
 // user is not admin, redirect to index.php
-if ($identity !== 'admin') {
+if ($identity !== 'admin' && $identity !== 'student') {
     header("Location: index.php");
     exit();
 }
@@ -115,25 +115,25 @@ if ($identity !== 'admin') {
             // Display table rows
             echo "<tr><th>Name</th>";
             foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stuname'  style='width: 200px;' value='{$row->stuname}' ></td>";
+                echo "<td>{$row->stuname}</td>";
             }
             echo "</tr>";
 
             echo "<tr><th>ICL ID</th>";
             foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='iclid' style='width: 200px;' value='{$row->icl_id}'></td>";
+                echo "<td>{$row->icl_id}</td>";
             }
             echo "</tr>";
         
             echo "<tr><th>Nationality</th>";
             foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stunationality' style='width: 200px;' value='{$row->stunationality}'></td>";
+                echo "<td>{$row->stunationality}</td>";
             }
             echo "</tr>";
         
             echo "<tr><th>University</th>";
             foreach ($student_basic_info as $row) {
-                echo "<td><input type='text' name='stuuniversity' style='width: 200px;' value='{$row->stuuniversity}'></td>";
+                echo "<td>{$row->stuuniversity}</td>";
             }
             echo "</tr>";
         
@@ -151,7 +151,7 @@ if ($identity !== 'admin') {
         
             echo "</table>";
             echo "</div>";
-            echo "<input type='submit' name='Submit' value='Save Changes' style='width: 120px;' onclick = refresh()>";
+            echo "<input type='submit' name='saveChanges' value='Save Changes' style='width: 120px;' onclick = refresh()>";
             echo "</form>";
             echo "</div>";
         } else {
@@ -162,23 +162,37 @@ if ($identity !== 'admin') {
         }
         
     }
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['saveChanges'])) {
         // Handle form submission
     
         // Validate and sanitize input (for security)
-        $stuname = isset($_POST["stuname"]) ? $_POST["stuname"] : null;
-        $iclid = isset($_POST["iclid"]) ? $_POST["iclid"] : null;
-        $stunationality = isset($_POST["stunationality"]) ? $_POST["stunationality"] : null;
-        $stuuniversity = isset($_POST["stuuniversity"]) ? $_POST["stuuniversity"] : null;
+        // $stuname = isset($_POST["stuname"]) ? $_POST["stuname"] : null;
+        // $iclid = isset($_POST["iclid"]) ? $_POST["iclid"] : null;
+        // $stunationality = isset($_POST["stunationality"]) ? $_POST["stunationality"] : null;
+        // $stuuniversity = isset($_POST["stuuniversity"]) ? $_POST["stuuniversity"] : null;
         $stuphone = isset($_POST["stuphone"]) ? $_POST["stuphone"] : null;
         $stuemail = isset($_POST["stuemail"]) ? $_POST["stuemail"] : null;
+
+        // Check if phone number is not a 10-digit number
+        if (!preg_match('/^\d{10}$/', $stuphone)) {
+            echo "Invalid phone number format. Please enter a 10-digit number.";
+            // throw new \Exception("Invalid phone number format. Please enter a 10-digit number.");
+            exit();
+        }
+
+        // Check if email exceeds 30 characters
+        if (strlen($stuemail) > 30) {
+            echo "Email length exceeds the maximum allowed characters (30).";
+            // throw new \Exception("Email length exceeds the maximum allowed characters (30).");
+            exit();
+        }
     
         try {
             DB::beginTransaction();
         
             // Retrieve the current record for comparison
             $existingRecord = DB::table('student')
-                ->where('icl_id', $iclid)
+                ->where('icl_id', $selectedIclID)
                 ->lockForUpdate() // Apply a lock to prevent concurrent updates
                 ->first();
         
@@ -187,23 +201,20 @@ if ($identity !== 'admin') {
             }
         
             //Compare the existing values with the submitted values
-            if (
-                $existingRecord->stuname !== $stuname ||
-                $existingRecord->stunationality !== $stunationality ||
-                $existingRecord->stuuniversity !== $stuuniversity ||
-                $existingRecord->stuphone !== $stuphone ||
-                $existingRecord->stuemail !== $stuemail
-            ) {
-                throw new \Exception("Concurrent update detected. Please refresh and try again.");
-            }
+            // if (
+            //     $existingRecord->stuphone !== $stuphone ||
+            //     $existingRecord->stuemail !== $stuemail
+            // ) {
+            //     throw new \Exception("Concurrent update detected. Please refresh and try again.");
+            // }
         
             // Update the record
             $result = DB::table('student')
-                ->where('icl_id', $iclid)
+                ->where('icl_id', $selectedIclID)
                 ->update([
-                    'stuname' => $stuname,
-                    'stunationality' => $stunationality,
-                    'stuuniversity' => $stuuniversity,
+                    // 'stuname' => $stuname,
+                    // 'stunationality' => $stunationality,
+                    // 'stuuniversity' => $stuuniversity,
                     'stuphone' => $stuphone,
                     'stuemail' => $stuemail,
                 ]);
@@ -211,12 +222,18 @@ if ($identity !== 'admin') {
             if ($result) {
                 DB::commit();
                 echo "Update successful!";
-                // Add JavaScript to refresh the page after 2 seconds
-                if($refresh==1){
-                    echo "<script>setTimeout(function(){ location.reload(); }, 2000);</script>";
-                }
+                if ($identity === 'student')
+                    header("Location: student.php");
+                if ($identity === 'admin')
+                    header("Location: adminSearchStudents.php");
+                exit();
+                // // Add JavaScript to refresh the page after 2 seconds
+                // if($refresh==1){
+                //     echo "<script>setTimeout(function(){ location.reload(); }, 2000);</script>";
+                // }
                 
             } else {
+                DB::rollBack();
                 throw new \Exception("Error updating record.");
             }
         } catch (\Exception $e) {
@@ -224,8 +241,6 @@ if ($identity !== 'admin') {
             echo $e->getMessage();
         }
     
-
-    }else{
 
     }
     ?>

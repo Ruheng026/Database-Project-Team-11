@@ -37,7 +37,7 @@ if ($identity !== 'student') {
     <div class="link-container">
         <a href="index.php" class="search-link">Home</a>
     </div>
-    <form action="student.php" method="post">
+    <!-- <form action="student.php" method="post"> -->
     <?php
         $selectedIclID = $password;
         // 1.1 student basic info
@@ -74,7 +74,7 @@ if ($identity !== 'student') {
         echo "<input type=\"hidden\" name=\"icl_id\" value= \"$row->icl_id\">";
         echo "<input type=\"hidden\" name=\"display\" value= \"editArea.style.display\">";
         echo "<div style='display: flex; flex-direction: row; gap: 10px; justify-content: center; align-items: baseline; margin-top: 20px;'>";
-        echo "<input type=\"submit\" value=\"Edit\">";
+        // echo "<input type=\"submit\" value=\"Edit\">";
         echo "</div>";
         echo "</form>";
 
