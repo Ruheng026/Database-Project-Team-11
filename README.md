@@ -103,9 +103,9 @@ After installation, start the Apache web server. To start Apache, go to the righ
 Access the system via **`http://localhost/your-project-folder/`** in your web browser.
 
 ### **測試帳號與密碼**
-admin: [ ID=admin, PASSWORD=123 ]
-student: [ ID=松浦明日香, PASSWORD=53 ]
-school: [ ID=七賢國中, PASSWORD=523504 ]
+- **admin**: [ ID=admin, PASSWORD=123 ]
+- **student**: [ ID=松浦明日香, PASSWORD=53 ]
+- **school**: [ ID=七賢國中, PASSWORD=523504 ]
 
 [to modify]
 
