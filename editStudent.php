@@ -53,6 +53,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
     <?php
         $refresh = 0;
         // 1.1 student basic info
+        DB::beginTransaction();
         $student_basic_info = DB::table('student')
             ->where('icl_id', $selectedIclID)
             ->select(
@@ -91,6 +92,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
             echo "<div style='text-align: center;'>";
             echo "No student found.";
             echo "</div>";
+            DB::rollBack();
             exit();
         }
         echo"<script>
@@ -159,6 +161,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
             echo "<div style='text-align: center;'>";
             echo "No student found.";
             echo "</div>";
+            DB::rollBack();
             exit();
         }
         
@@ -178,6 +181,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
         if (!preg_match('/^\d{10}$/', $stuphone)) {
             echo "Invalid phone number format. Please enter a 10-digit number.";
             // throw new \Exception("Invalid phone number format. Please enter a 10-digit number.");
+            DB::rollBack();
             exit();
         }
 
@@ -185,12 +189,11 @@ if ($identity !== 'admin' && $identity !== 'student') {
         if (strlen($stuemail) > 30) {
             echo "Email length exceeds the maximum allowed characters (30).";
             // throw new \Exception("Email length exceeds the maximum allowed characters (30).");
+            DB::rollBack();
             exit();
         }
     
         try {
-            DB::beginTransaction();
-        
             // Retrieve the current record for comparison
             $existingRecord = DB::table('student')
                 ->where('icl_id', $selectedIclID)
@@ -233,12 +236,12 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 // }
                 
             } else {
-                DB::rollBack();
                 throw new \Exception("Error updating record.");
+                DB::rollBack();
             }
         } catch (\Exception $e) {
-            DB::rollBack();
             echo $e->getMessage();
+            DB::rollBack();
         }
     
 
