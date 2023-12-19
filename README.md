@@ -13,14 +13,6 @@
 - **`composer.lock`**: Lock file to record the exact versions of dependencies installed.
 - **`eloquent.php`**: Sets up the Eloquent ORM configuration and initializes the database connection.
 - **`style.css`**: Contains the CSS styles for the project's frontend.
-
-請先參考 index.php，會根據是否登入、登入的身分別，render 不同的畫面，檔案也連結好了
-
-測試帳密
-admin: [ ID=admin, PASSWORD=123 ]
-student: [ ID=松浦明日香, PASSWORD=53 ]
-school: [ ID=七賢國中, PASSWORD=523504 ]
-
 - **`login.php`**: 登入，記錄使用者名稱（ID）、ID（password）、身分別（admin / student / school）
                    在其他需要登入才能使用的頁面，先寫 session_start()，並確認使用者是否登入，
                    再透過
@@ -109,6 +101,11 @@ After installation, start the Apache web server. To start Apache, go to the righ
 ### **See the index page**
 
 Access the system via **`http://localhost/your-project-folder/`** in your web browser.
+
+### **測試帳號與密碼**
+admin: [ ID=admin, PASSWORD=123 ]
+student: [ ID=松浦明日香, PASSWORD=53 ]
+school: [ ID=七賢國中, PASSWORD=523504 ]
 
 [to modify]
 
