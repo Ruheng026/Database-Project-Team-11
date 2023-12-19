@@ -84,7 +84,7 @@ Configure the database connection in **`eloquent.php`** with your PostgreSQL cre
 
 ### **Step 8: Installing PostgreSQL driver for PHP**
 
-Go to your PHP directory (e.g., at **`C:\xampp\php`**) to edit php.ini using any plain text editor. Uncomment **`;extension=pdo_pgsql`** and **`;extension=pgsql'** by removing the semicolons. 
+Go to your PHP directory (e.g., at **`C:\xampp\php`**) to edit php.ini using any plain text editor. Uncomment **`;extension=pdo_pgsql`** and **`;extension=pgsql`** by removing the semicolons. 
 
 
 
