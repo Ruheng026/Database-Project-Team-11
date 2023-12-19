@@ -255,6 +255,27 @@ if ($identity !== 'school') {
             }else{
 
             }
+
+            $group_international = DB::table('group_')
+            ->join('student',function($join){
+                $join->on('group_.intlicl_id','=','student.icl_id');
+            })
+            ->where('group_.group_id', $group_id)
+            ->where('group_.semester', $semester)
+            ->select('student.*','group_.*')
+            ->get();
+
+            if($group_international->isNotEmpty()){
+                echo "<h3 style='text-align: left;'>Partner's Information </h3>";
+                echo "<table>";
+                echo "<tr><th>Name</th><th>ICL ID</th><th>Nationality</th><th>University</th><th>Phone</th><th>Email</th></tr>";
+                foreach ($group_international as $row) {
+                    echo "<tr><td>{$row->stuname}</td><td>{$row->group_id}</td><td>{$row->icl_id}</td><td>{$row->stunationality}</td><td>{$row->stuuniversity}</td><td>{$row->stuphone}</td><td>{$row->stuemail}</td></tr>";
+                }
+                echo "</table>";
+            }else{
+                
+            }
         }
     
     ?>
