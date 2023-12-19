@@ -97,12 +97,13 @@ if ($identity !== 'admin') {
                     <td>{$row->stuphone}</td>
                     <td>{$row->stuemail}</td>
                 
-                        <form action=\"editStudent.php\" method=\"post\">
-                            <input type=\"hidden\" name=\"icl_id\" value=\"$selectedIclID\">
-                        </form>
+                <form action=\"editStudent.php\" method=\"post\">
+                    <input type=\"hidden\" name=\"icl_id\" value=\"$selectedIclID\">
+                </form>
          
-        </tr>";
-}
+                </tr>";
+            }
+            
             echo "<input type=\"hidden\" name=\"icl_id\" value= \"$row->icl_id\">";
             echo "<input type=\"hidden\" name=\"display\" value= \"editArea.style.display\">";
             echo "<form action=\"editStudent.php\" method=\"post\">";

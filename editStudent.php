@@ -23,6 +23,10 @@ if ($identity !== 'admin' && $identity !== 'student') {
     header("Location: index.php");
     exit();
 }
+
+DB::beginTransaction();
+DB::table('student')->lockForUpdate()->get();
+
 ?>
 <meta charset="UTF-8">
 <!DOCTYPE html>
@@ -53,7 +57,6 @@ if ($identity !== 'admin' && $identity !== 'student') {
     <?php
         $refresh = 0;
         // 1.1 student basic info
-        DB::beginTransaction();
         $student_basic_info = DB::table('student')
             ->where('icl_id', $selectedIclID)
             ->select(
@@ -67,7 +70,6 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 'student.stuuniversity',
                 'student.stuemail'
             )
-            ->lockForUpdate() // Apply a lock to prevent concurrent updates
             ->get();
 
         if ($student_basic_info->isNotEmpty()) {
