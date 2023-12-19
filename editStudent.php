@@ -208,7 +208,10 @@ if ($identity !== 'admin' && $identity !== 'student') {
             if ($result) {
                 DB::commit();
                 echo "Update successful!";
-                header("Location: student.php");
+                if ($identity === 'student')
+                    header("Location: student.php");
+                if ($identity === 'admin')
+                    header("Location: adminSearchStudents.php");
                 exit();
                 // // Add JavaScript to refresh the page after 2 seconds
                 // if($refresh==1){
