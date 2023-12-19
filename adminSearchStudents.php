@@ -35,6 +35,7 @@ if ($identity !== 'admin') {
 <div class="container">
     <?php
     echo "<h1>Students Information</h1>";
+    $selectedIclID = "";
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedIclID = $_POST['icl_id'];
         if ($selectedIclID === "") {

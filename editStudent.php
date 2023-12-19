@@ -172,6 +172,20 @@ if ($identity !== 'admin' && $identity !== 'student') {
         // $stuuniversity = isset($_POST["stuuniversity"]) ? $_POST["stuuniversity"] : null;
         $stuphone = isset($_POST["stuphone"]) ? $_POST["stuphone"] : null;
         $stuemail = isset($_POST["stuemail"]) ? $_POST["stuemail"] : null;
+
+        // Check if phone number is not a 10-digit number
+        if (!preg_match('/^\d{10}$/', $stuphone)) {
+            echo "Invalid phone number format. Please enter a 10-digit number.";
+            // throw new \Exception("Invalid phone number format. Please enter a 10-digit number.");
+            exit();
+        }
+
+        // Check if email exceeds 30 characters
+        if (strlen($stuemail) > 30) {
+            echo "Email length exceeds the maximum allowed characters (30).";
+            // throw new \Exception("Email length exceeds the maximum allowed characters (30).");
+            exit();
+        }
     
         try {
             DB::beginTransaction();
@@ -187,12 +201,12 @@ if ($identity !== 'admin' && $identity !== 'student') {
             }
         
             //Compare the existing values with the submitted values
-            if (
-                $existingRecord->stuphone !== $stuphone ||
-                $existingRecord->stuemail !== $stuemail
-            ) {
-                throw new \Exception("Concurrent update detected. Please refresh and try again.");
-            }
+            // if (
+            //     $existingRecord->stuphone !== $stuphone ||
+            //     $existingRecord->stuemail !== $stuemail
+            // ) {
+            //     throw new \Exception("Concurrent update detected. Please refresh and try again.");
+            // }
         
             // Update the record
             $result = DB::table('student')
