@@ -13,20 +13,13 @@
 - **`composer.lock`**: Lock file to record the exact versions of dependencies installed.
 - **`eloquent.php`**: Sets up the Eloquent ORM configuration and initializes the database connection.
 - **`style.css`**: Contains the CSS styles for the project's frontend.
-- **`login.php`**: 登入，記錄使用者名稱（ID）、ID（password）、身分別（admin / student / school）
-                   在其他需要登入才能使用的頁面，先寫 session_start()，並確認使用者是否登入，
-                   再透過
-                   $userID = $_SESSION['user_id'];
-                   $password = $_SESSION['password'];
-                   $identity = $_SESSION['identity'];
-                   取得相應的變數。
-                   根據 identity 檢查身分別是否 valid
-- **`logout.php`**: 使用者登出，結束 session，回到 `index.php`
+- **`login.php`**: 登入，開始 session，記錄使用者名稱（ID）、ID（password）、身分別（admin / student / school）
+- **`logout.php`**: 登出，結束 session，回到 `index.php`
 - **`publicStatistics.php`**: ICL 公開的資訊，包含按國籍排序參與者數量、合作的學校、學校參與的學期與 session 資料等。
                               使用者無論是否登入都能查看本頁
 - **`getSchoolsByCounty`**: 根據 public statistics 中 search a school 的 county 欄位，動態 fetch 位於該 county 的 schools
-- **`adminStatistics.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 overall attendance rate、attendance rate 最低的學生、no show rate 最高的 trips 等、課程資訊等。
-- **`adminTrips.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 trips 的資料，包含日期、拜訪的學校、參與的學生等。
+- **`adminStatistics.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 overall attendance rate、attendance rate 最低的學生、no show rate 最高的 trips、課程資訊等
+- **`adminTrips.php`**: 僅 ICL admin 可以查看的頁面，用於搜尋 trips 的資料，包含日期、拜訪的學校、參與的學生等
 
 [to implement]
 - **`adminStudents.php`**: admin 查詢 students
@@ -107,16 +100,27 @@ Access the system via **`http://localhost/your-project-folder/`** in your web br
 - **student**: [ ID=松浦明日香, PASSWORD=53 ]
 - **school**: [ ID=七賢國中, PASSWORD=523504 ]
 
-[to modify]
+### **Public Interface**
 
-### **User Interface**
+- Navigate to **`publicStatistics.php`** by clicking the **`Public Statistics`** button for the Public Search interface.
+- Navigate to **`login.php`** by clicking the **`Login`** button.
+- If logged in, navigate to **`logout.php`** and then **`index.php`** by clicking the **`Log Out`** button in all interfaces.
+- If not already at **index.php**, navigate to **`index.php`** by clicking the **`Home`** button in all interfaces.
 
-Navigate to **`user.php`** for the User Search interface.
+### **Student Interface**
+
+Navigate to **`student.php`** by clicking the **`My Page`** button for the Student Search interface.
+
+### **School Interface**
+
+Navigate to **`school.php`** by clicking the **`My Page`** button for the School Search interface.
 
 ### **Admin Interface**
 
-Navigate to **`admin.php`** for the Administrator Search interface.
+- Navigate to **`adminStudents.php`** by clicking the **`Admin Students`** button for the Administrator Student Search interface.
+- Navigate to **`adminSchools.php`** by clicking the **`Admin Schools`** button for the Administrator School Search interface.
+- Navigate to **`adminTrips.php`** by clicking the **`Admin Trips`** button for the Administrator Trip Search interface.
+- Navigate to **`adminStatistics.php`** by clicking the **`Admin Statistics`** button for the Administrator Search interface.
 
-[/to modify]
 
 
