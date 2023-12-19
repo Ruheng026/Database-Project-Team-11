@@ -101,6 +101,11 @@ if ($identity !== 'admin') {
             foreach($studentLoc as $row){
                 $selectedIntlName = $row->stuname;
             }
+
+            $attend_status = DB::table('attend_status')
+            ->select('attend_status.*')
+            ->get();
+
             if ($local_session->isNotEmpty() || $intl_session->isNotEmpty()) {
                 echo "<h3 style='text-align: left;'>Session Info </h3>";
 
@@ -110,11 +115,30 @@ if ($identity !== 'admin') {
                 // Iterate over the international sessions
                 foreach ($intl_session as $intl_row) {
                     $local_row = $local_session->firstWhere('date', $intl_row->date);
-                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th><th>{$intl_row->intl}</th>";
+                    echo "<tr><th>{$intl_row->date}</th><th>{$intl_row->starttime}~{$intl_row->endtime}</th>
+                    <th>
+                    <select name=\"selectedLocStatus\" id=\"selectedLocStatus\">";
+                    foreach($attend_status as $row){
+                        $selected =($_POST['selectedLocStatus']??'')==$row->attendtype?'attendtype':'';
+                        echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
+                    }
+                    echo"
+                    </select>
+                    {$intl_row->intl}
+                    </th>";
                     
                     // Check if corresponding international session exists
                     if ($intl_row) {
-                        echo "<th>{$intl_row->intl}</th></tr>";
+                        echo "<th>
+                        <select name=\"selectedIntlStatus\" id=\"selectedIntlStatus\">";
+                        foreach($attend_status as $row){
+                            $selected =($_POST['selectedIntlStatus']??'')==$row->attendtype?'attendtype':'';
+                            echo"<option value='{$row->attendtype}'{$selected}>{$row->attendtype}</option>";
+                        }
+                        echo"
+                        </select>
+                        {$intl_row->intl}
+                        </th></tr>";
                     } else {
                         echo "<th>N/A</th></tr>";
                     }
