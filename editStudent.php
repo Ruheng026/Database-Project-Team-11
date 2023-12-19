@@ -95,12 +95,12 @@ if ($identity !== 'admin' && $identity !== 'student') {
             DB::rollBack();
             exit();
         }
-        echo"<script>
-        function refresh{
-            $refresh = 1;
-            setTimeout(function(){ location.reload(); }, 2000);
-        }
-        </script>";
+        // echo"<script>
+        // function refresh{
+        //     $refresh = 1;
+        //     setTimeout(function(){ location.reload(); }, 2000);
+        // }
+        // </script>";
     
         if ($student_basic_info->isNotEmpty()) {
             echo "<div id='edit_area' style='text-align: center;'>
@@ -228,7 +228,7 @@ if ($identity !== 'admin' && $identity !== 'student') {
                 if ($identity === 'student')
                     header("Location: student.php");
                 if ($identity === 'admin')
-                    header("Location: adminSearchStudents.php");
+                    header("Location: adminStudents.php");
                 exit();
                 // // Add JavaScript to refresh the page after 2 seconds
                 // if($refresh==1){
